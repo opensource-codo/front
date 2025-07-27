@@ -1,0 +1,31 @@
+.full-expanded-window {
+  position: fixed;
+  top: 10%;
+  left: 25%;
+  width: 700px;
+  height: 1400px;
+  background: #f0edff;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  gap: 10px;
+}
+
+.header img {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.2s;
+}
+
+.header img:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
