@@ -14,7 +14,7 @@ function ExpandedWindow({ onClose, onExpandFull }) {
 
 
   //전송 함수
-  const sendMessage = async () => {
+  const sendMessage = async (method = "guide") => {
 
     //입력창이 공백일 때 
     if (!inputText.trim()) return;
@@ -23,7 +23,8 @@ function ExpandedWindow({ onClose, onExpandFull }) {
     setMessages(prev => [...prev, { from: 'user', text: inputText }]);
     
     const payload = {
-      text: inputText
+      text: inputText,
+      method: method
     };
 
     setInputText('');  // 입력창 비우기
@@ -31,7 +32,7 @@ function ExpandedWindow({ onClose, onExpandFull }) {
     try {
 
       //서버에 analyze 요청보내기
-      const res = await axios.post('http://localhost:8000/api/analyze', payload);
+      const res = await axios.post('http://localhost:8000/api/v1/userInput', payload);
       
       //응답 메시지 추가
       setMessages(prev => [
@@ -71,13 +72,24 @@ function ExpandedWindow({ onClose, onExpandFull }) {
     }
   };
 
+  // 단축키 안내 버튼 클릭 처리
+  const handleShortcutGuide = () => {
+    setInputText('단축키 안내');
+    sendMessage('GUIDE');
+  };
+
+  // 자동 실행 버튼 클릭 처리
+  const handleAutoExecution = () => {
+    setInputText('자동 실행');
+    sendMessage('EXECUTION');
+  };
+
   return (
     <div className="expanded-window">
       <div className="header">
         <img src={maximizeIcon} alt="Maximize" onClick={onExpandFull} />
         <img src={closeIcon} alt="Close" onClick={onClose} />
       </div>
-
 
       <div className="body">
         {messages.map((m, i) => (
@@ -96,20 +108,23 @@ function ExpandedWindow({ onClose, onExpandFull }) {
           onChange={e => setInputText(e.target.value)}
           onKeyDown={onKeyDown}
         />
-        <button className="send-button" onClick={sendMessage}>
+        <button className="send-button" onClick={() => sendMessage()}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           전송
         </button>
       </div>
 
-      <div className='suggestions-buttons'>
-        {['단축키 안내','자동실행'].map(option => (
-          <button key={option} className='selectedSuggestion === option ? 'selected' : ''} onClick={() => {
-            setSelectedSuggestion(prev => (prev ===option ? null :option));
-        
-          }}
-        ))}
+      <div className="suggestion-buttons">
+        <button onClick={handleShortcutGuide} className="suggestion-button">
+          ⌨️ 단축키 안내
+        </button>
+        <button onClick={handleAutoExecution} className="suggestion-button">
+          ⚡ 자동 실행
+        </button>
       </div>
-
     </div>
   );
 }
