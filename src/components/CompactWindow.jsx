@@ -1,5 +1,5 @@
 import React from 'react';
-import codoButton from '../assets/codo_button.png'
+import codoButton from '../assets/CODO_icon.png'
 
 function CompactWindow({ onExpand }){
     return (

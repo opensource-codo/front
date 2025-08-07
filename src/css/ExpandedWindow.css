@@ -31,7 +31,7 @@
   transition: all 0.2s ease;
   padding: 8px;
   border-radius: var(--radius-sm);
-  background-color: var(--background-secondary);
+  background-color: var(--secondary-color);
 }
 
 .header img:hover {
@@ -88,8 +88,8 @@
 }
 
 .message.system {
-  background-color: var(--accent-color);
-  color: white;
+  background-color: white;
+  color: var(--text-primary);
   align-self: center;
   font-weight: 500;
 }

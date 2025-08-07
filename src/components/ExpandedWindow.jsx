@@ -31,7 +31,6 @@ function ExpandedWindow({ onClose, onExpandFull }) {
 
     try {
 
-      //서버에 analyze 요청보내기
       const res = await axios.post('http://localhost:8000/api/v1/userInput', payload);
       
       //응답 메시지 추가
