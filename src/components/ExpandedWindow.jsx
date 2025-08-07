@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, seEffect, useContext } from 'react';
 import axios from 'axios';
 import maximizeIcon from '../assets/checkbox.png';
 import closeIcon from '../assets/close.png';
@@ -11,6 +11,7 @@ function ExpandedWindow({ onClose, onExpandFull }) {
   const [messages, setMessages] = useState([
     { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
   ]);
+
 
   //전송 함수
   const sendMessage = async () => {
@@ -53,9 +54,19 @@ function ExpandedWindow({ onClose, onExpandFull }) {
     }
   };
 
+  const [selectedSuggestion, setSelectedSuggestion] = useState(' ');
+
   // 엔터키 입력 처리 
   const onKeyDown = (e) => {
     if (e.key === 'Enter') {
+      if (selectedSuggestion === '단축키안내'){
+        setInputText('단축키 안내');
+        sendMessage('단축키 안내')
+      } else if (selectedSuggestion === '자동실행'){
+        //runAUtoExecution();
+      } else {
+        sendMessage();
+      }
       sendMessage();
     }
   };
@@ -86,13 +97,19 @@ function ExpandedWindow({ onClose, onExpandFull }) {
           onKeyDown={onKeyDown}
         />
         <button className="send-button" onClick={sendMessage}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
           전송
         </button>
       </div>
+
+      <div className='suggestions-buttons'>
+        {['단축키 안내','자동실행'].map(option => (
+          <button key={option} className='selectedSuggestion === option ? 'selected' : ''} onClick={() => {
+            setSelectedSuggestion(prev => (prev ===option ? null :option));
+        
+          }}
+        ))}
+      </div>
+
     </div>
   );
 }
