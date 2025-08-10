@@ -1,3 +1,7 @@
+html, body, #root {
+  background: transparent !important;  /* Electron transparent 창과 맞물림 */
+}
+
 :root {
   --primary-color: #6366f1;
   --primary-hover: #4f46e5;
