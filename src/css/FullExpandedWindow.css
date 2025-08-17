@@ -1,7 +1,7 @@
 .full-expanded-window {
   display: flex;
-  width: 100%;
-  height: 95vh;
+  width: 900px;
+  height: 900px;
   background-color: rgba(255, 255, 255, 0.7);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -17,7 +17,7 @@
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   border-right: 1px solid var(--border-color);
 }
 
@@ -34,6 +34,7 @@
 .logo-icon {
   width: 32px;
   height: 32px;
+  margin-left: 12px;;
   object-fit: contain;
 }
 
@@ -74,6 +75,7 @@
 
 .user-profile {
   margin-top: auto;
+  margin-left: 12px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -102,6 +104,10 @@
   content: "U";
 }
 
+.user-profile .username {
+  font-weight: 500;
+}
+
 .main-content {
   flex: 1;
   position: relative;
@@ -109,16 +115,22 @@
   background-color: rgba(255, 255, 255, 0.7);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  overflow-y: auto;
 }
 
 .header {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  width:100%;
+  height: 44px;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 16px;
+  padding: 8px 24px 0 24px;
+  -webkit-app-region: drag;
 }
 
 .header img {
@@ -129,7 +141,7 @@
   transition: all 0.2s ease;
   padding: 8px;
   border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(248, 250, 252, 0.7);
 }
 
 .header img:hover {
@@ -138,10 +150,27 @@
   transform: scale(1.1);
 }
 
+.header img,
+.header button,
+.header svg {
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+
 .body {
   width: 100%;
   max-width: 800px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex-grow: 1;
+  min-height: 100px;
 }
 
 .body h2 {
@@ -151,10 +180,37 @@
   font-weight: 600;
 }
 
-.body p {
-  font-size: 1.25rem;
+.body .message {
+  max-width: 75%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-radius: var(--radius-xl);
+  line-height: 1.5;
+  word-break: break-word;
+  display: inline-block;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.body .message.user {
+  background-color: var(--primary-color);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.body .message.bot {
+  background-color: rgba(248, 250, 252, 0.7);
   color: var(--text-primary);
-  margin-bottom: 48px;
+  align-self: flex-start;
+  border-bottom-left-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.body .message.system {
+  background-color: rgba(255, 255, 255, 0.7);
+  color: var(--text-primary);
+  align-self: center;
   font-weight: 500;
 }
 
@@ -173,8 +229,8 @@
 }
 
 .input-container:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+  border-color: var(--border-color);
+  box-shadow: none;
 }
 
 .input-top {
@@ -257,52 +313,7 @@
   filter: brightness(0) invert(1);
 }
 
-.messages-container {
-  margin-top: 32px;
-  width: 100%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 16px;
-  background-color: rgba(248, 250, 252, 0.7);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-color);
-}
 
-.messages-container .message {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: var(--radius-xl);
-  line-height: 1.5;
-  word-break: break-word;
-  font-size: 0.95rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.messages-container .message.user {
-  background-color: var(--primary-color);
-  color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: var(--radius-sm);
-}
-
-.messages-container .message.bot {
-  background-color: rgba(255, 255, 255, 0.7);
-  color: var(--text-primary);
-  align-self: flex-start;
-  border-bottom-left-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-}
-
-.messages-container .message.system {
-  background-color: rgba(255, 255, 255, 0.7);
-  color: var(--text-primary);
-  align-self: center;
-  font-weight: 500;
-}
 
 /* 자주 쓰는 기능 화면 스타일 */
 .frequent-functions-container {

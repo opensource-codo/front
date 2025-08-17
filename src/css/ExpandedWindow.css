@@ -29,9 +29,9 @@
   cursor: pointer;
   opacity: 0.7;
   transition: all 0.2s ease;
-  padding: 8px;
+  padding: 0px;
   border-radius: var(--radius-sm);
-  background-color: rgba(248, 250, 252, 0.7);
+  background-color:transparent !important;
 }
 
 .header img:hover {
@@ -88,7 +88,7 @@
 }
 
 .message.system {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: transparent !important;
   color: var(--text-primary);
   align-self: center;
   font-weight: 500;
@@ -130,8 +130,8 @@
 .send-button {
   padding: 12px 20px;
   border-radius: var(--radius-lg);
-  background-color: var(--primary-color);
-  color: white;
+  color: white; 
+  background-color: var(--primary-hover);
   border: none;
   cursor: pointer;
   font-weight: 500;

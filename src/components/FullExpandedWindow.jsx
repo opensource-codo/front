@@ -125,7 +125,11 @@ function FullExpandedWindow({ onMinimize, onClose }) {
                 <div className='body'>
                     {activeMenu === 'home' ? (
                         <>
-                            <p>안녕하세요! 무엇을 도와드릴까요?</p>
+                            {messages.map((m, i) => (
+                                <div key={i} className={`message ${m.from}`}>
+                                    {m.text}
+                                </div>
+                            ))}
 
                             <div className='input-container'>
                                 <div className='input-top'>
@@ -155,16 +159,6 @@ function FullExpandedWindow({ onMinimize, onClose }) {
                                     </button>
                                 </div>
                             </div>
-
-                            {messages.length > 1 && (
-                                <div className='messages-container'>
-                                    {messages.slice(1).map((message, index) => (
-                                        <div key={index} className={`message ${message.from}`}>
-                                            {message.text}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </>
                     ) : activeMenu === 'frequent' ? (
                         <div className='frequent-functions-container'>
