@@ -21,3 +21,33 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# --- mock / local-only ---
+mock_server.py
+requirements.txt
+run_server.bat
+run_server.sh
+README_MOCK.md
+
+# 앞으로 쓸 수 있는 목업 폴더들(있으면 통째로 무시)
+mocks/
+src/mocks/
+public/mock-data/
+
+codo_env/
+venv/
+.venv/
+
+# .gitignore가 없다면 만들기
+if (!(Test-Path .gitignore)) { New-Item .gitignore -ItemType File | Out-Null }
+
+# 가상환경/캐시 무시 규칙 추가
+Add-Content .gitignore "`ncodo_env/"
+Add-Content .gitignore "venv/"
+Add-Content .gitignore ".venv/"
+Add-Content .gitignore "env/"
+Add-Content .gitignore "__pycache__/"
+Add-Content .gitignore "*.py[cod]"
+Add-Content .gitignore "*.egg-info/"
+Add-Content .gitignore "node_modules/"
+

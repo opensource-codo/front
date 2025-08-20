@@ -1,21 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import minimizeIcon from '../assets/minimize.png';
 import closeIcon from '../assets/close.png';
 import arrowSubmit from '../assets/arrow-submit.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
+import useAgent from '../hooks/useAgent';
 
-function FullExpandedWindow({ onMinimize, onClose }) {
+function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [inputText, setInputText] = useState('');
-    const [messages, setMessages] = useState([
-        { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
-    ]);
 
     const [activeMenu, setActiveMenu] = useState('home'); // 활성 메뉴 상태 추가
     const [frequentFunctions, setFrequentFunctions] = useState([]);
     const [recentFunctions, setRecentFunctions] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const bodyRef = useRef(null);
+
+    // agent prop에서 필요한 값들을 가져오기
+    const {
+        ui, loading: agentLoading, messages,
+        send, goToExecution, submitMissingParams,
+        confirmExecution, cancelExecution
+    } = agent;
+
+    useEffect(() => {
+        bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
+    }, [messages, ui, agentLoading]);
 
     // 자주 쓰는 기능 데이터 가져오기
     const fetchFrequentFunctions = async () => {
@@ -52,36 +63,38 @@ function FullExpandedWindow({ onMinimize, onClose }) {
 
     // 홈으로 돌아가는 함수
     const goHome = () => {
-        setMessages([
-            { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
-        ]);
+        // setMessages([ // This line was removed as per the edit hint
+        //     { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
+        // ]);
         setInputText('');
         setActiveMenu('home'); // 홈 메뉴 활성화
     };
 
-    const sendMessage = async () => {
-        if (!inputText.trim()) return;
+    const sendMessage = async (method = "GUIDE", overrideText) => {
+        const text = (overrideText ?? inputText).trim();
+        if (!text || agentLoading) return;
 
-        setMessages(prev => [...prev, { from: 'user', text: inputText }]);
         setInputText('');
 
-        // 여기에 실제 API 호출 로직을 추가할 수 있습니다
-        setTimeout(() => {
-            setMessages(prev => [
-                ...prev,
-                { from: 'bot', text: '메시지를 받았습니다. 곧 응답하겠습니다.' }
-            ]);
-        }, 1000);
+        // 서버 호출 (useAgent의 send에서 자동으로 메시지 추가됨)
+        await send({ text, method });
     };
 
     const onKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage('GUIDE');
         }
     };
 
     const handleSuggestionClick = (suggestion) => {
-        setInputText(suggestion);
+        if (suggestion === '단축키 안내') {
+            sendMessage('GUIDE', '단축키 안내');
+        } else if (suggestion === '자동 실행') {
+            sendMessage('EXECUTION', '자동 실행');
+        } else {
+            setInputText(suggestion);
+        }
     };
 
     return (
@@ -122,14 +135,71 @@ function FullExpandedWindow({ onMinimize, onClose }) {
                     <img src={closeIcon} alt="Close" onClick={onClose} />
                 </div>
                 
-                <div className='body'>
+                <div className='body' ref={bodyRef}>
                     {activeMenu === 'home' ? (
                         <>
-                            {messages.map((m, i) => (
-                                <div key={i} className={`message ${m.from}`}>
+                            {messages.map((m) => (
+                                <div key={m.id} className={`message ${m.type}`}>
                                     {m.text}
                                 </div>
                             ))}
+
+                            {/* GUIDE 카드 */}
+                            {ui.guide && (
+                                <div className="card">
+                                    <div style={{ marginBottom: 6 }}>
+                                        <b>단축키:</b> {ui.guide.shortcut || '-'}
+                                    </div>
+                                    <button className="send-button" onClick={goToExecution}>
+                                        실행으로 전환
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* 누락 파라미터 폼 */}
+                            {ui.missing && (
+                                <MissingParamsForm
+                                    schema={ui.missing.schema}
+                                    required={ui.missing.required}
+                                    onSubmit={async (filled) => {
+                                        const data = await submitMissingParams(filled);
+                                        // setMessages(prev => [...prev, { from: 'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                                    }}
+                                />
+                            )}
+
+                            {/* 확인 모달 */}
+                            {ui.confirm && (
+                                <div className="modal">
+                                    <div className="modal-content">
+                                        <h4>실행 확인</h4>
+                                        <pre className="code-block">{JSON.stringify(ui.confirm, null, 2)}</pre>
+                                        <div className="modal-actions">
+                                            <button className="send-button" onClick={async () => {
+                                                const data = await confirmExecution();
+                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                                            }}>확인</button>
+                                            <button className="secondary-button" onClick={async () => {
+                                                const data = await cancelExecution();
+                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                                            }}>취소</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 실패/토스트/로딩 */}
+                            {ui.error && (
+                                <div className="error-card">
+                                    <div style={{ fontWeight: 600 }}>{ui.error.message}</div>
+                                    {ui.error.details?.length > 0 && (
+                                        <pre className="code-block">{JSON.stringify(ui.error.details, null, 2)}</pre>
+                                    )}
+                                </div>
+                            )}
+
+                            {ui.toast && <div className={`toast ${ui.toast.type}`}>{ui.toast.text}</div>}
+                            {agentLoading && <div className="loading">처리 중...</div>}
 
                             <div className='input-container'>
                                 <div className='input-top'>
@@ -140,8 +210,9 @@ function FullExpandedWindow({ onMinimize, onClose }) {
                                         value={inputText}
                                         onChange={(e) => setInputText(e.target.value)}
                                         onKeyDown={onKeyDown}
+                                        disabled={agentLoading}
                                     />
-                                    <button className="send-button" onClick={() => sendMessage()}>
+                                    <button className="send-button" onClick={() => sendMessage('GUIDE')} disabled={agentLoading}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -203,6 +274,37 @@ function FullExpandedWindow({ onMinimize, onClose }) {
                     )}
                 </div>
             </div>
+        </div>
+    );
+}
+
+/** 스키마를 읽어 동적으로 필수 파라미터 입력 폼 생성 */
+function MissingParamsForm({ schema, required, onSubmit }) {
+    const [form, setForm] = useState({});
+    if (!schema || !required?.length) return null;
+
+    return (
+        <div className="card">
+            <b>추가 입력이 필요합니다</b>
+            <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
+                {schema.required?.filter(r => required.includes(r.name)).map((r) => (
+                    <label key={r.name} className="field">
+                        <span className="label">{r.name} <small>({r.type})</small></span>
+                        <input
+                            className="missing-input"
+                            placeholder={r.description || `${r.name} 입력`}
+                            onChange={(e) => setForm(prev => ({ ...prev, [r.name]: e.target.value }))}
+                        />
+                    </label>
+                ))}
+            </div>
+            <button className="send-button" style={{ marginTop: 10 }} onClick={() => onSubmit(form)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 2L16 22L12 13L3 9L23 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                누락값 제출
+            </button>
         </div>
     );
 }

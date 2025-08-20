@@ -1,3 +1,15 @@
+/* 한글 폰트 지원 - 강화 */
+* {
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+  font-display: swap;
+}
+
+/* 메시지 텍스트에 특별히 한글 폰트 적용 */
+.message, .message * {
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
+  line-style: 1.4;
+}
+
 .expanded-window {
   position: fixed;
   top: 10%;
@@ -24,8 +36,8 @@
 }
 
 .header img {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   opacity: 0.7;
   transition: all 0.2s ease;
@@ -61,29 +73,33 @@
 }
 
 .message {
-  max-width: 75%;
+  max-width: 400px; /* 75% 대신 고정 픽셀 값으로 제한 */
+  min-width: 60px; /* 최소 너비 설정 */
   padding: 12px 16px;
   margin: 8px 0;
-  border-radius: var(--radius-xl);
+  border-radius: 18px; /* 더 부드러운 radius */
   line-height: 1.5;
   word-break: break-word;
   display: inline-block;
   font-size: 0.95rem;
   box-shadow: var(--shadow-sm);
-}
+  overflow: visible !important;   /* ← 스크롤 끄기 */
+  max-height: none !important;    /* ← 높이 제한 해제 */
+  box-sizing: border-box;
 
+}
 .message.user {
   background-color: var(--primary-color);
   color: white;
   align-self: flex-end;
-  border-bottom-right-radius: var(--radius-sm);
+  border-bottom-right-radius: 6px; /* 더 부드러운 모서리 */
 }
 
 .message.bot {
   background-color: rgba(248, 250, 252, 0.7);
   color: var(--text-primary);
   align-self: flex-start;
-  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-left-radius: 6px; /* 더 부드러운 모서리 */
   border: 1px solid var(--border-color);
 }
 
@@ -92,6 +108,7 @@
   color: var(--text-primary);
   align-self: center;
   font-weight: 500;
+  max-width: 600px; /* 시스템 메시지는 조금 더 길게 */
 }
 
 .chat-input-area {
@@ -121,6 +138,7 @@
   font-size: 0.95rem;
   background: transparent;
   color: var(--text-primary);
+  line-height: 1.4;
 }
 
 .chat-input::placeholder {
@@ -184,3 +202,114 @@
   box-shadow: var(--shadow-sm);
 }
 
+.card {
+  width: 100%;
+  max-width: 720px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  background: rgba(248, 250, 252, 0.75);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+/* 코드블록 공통 */
+.code-block {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: #0b1020;
+  color: #e5e7eb;
+  font-size: 12.5px;
+  overflow-x: auto;
+}
+
+/* 입력 필드 */
+.field .label {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: var(--text-secondary);
+}
+.missing-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  background: white;
+}
+.missing-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+}
+
+/* 모달 */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.25);
+  z-index: 10000;
+}
+.modal-content {
+  width: 600px;
+  max-width: calc(100% - 32px);
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+}
+.modal-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.secondary-button {
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.secondary-button:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 오류 카드 & 토스트 & 로딩 */
+.error-card {
+  width: 100%;
+  max-width: 720px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #7f1d1d;
+  border-radius: var(--radius-lg);
+}
+.toast {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: #f1f5f9;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+.toast.success { background: #ecfeff; border-color: #a5f3fc; }
+.toast.info    { background: #eff6ff; border-color: #bfdbfe; }
+.toast.warning { background: #fef9c3; border-color: #fde68a; }
+
+.loading {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: .9rem;
+
+  display: inline-flex;
+  align-self: center;
+  width: auto;
+}
