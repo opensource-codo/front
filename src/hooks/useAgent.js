@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import readyToExecute from '../ready_to_execute.json';
 
 export default function useAgent({ onExpandFull } = {}) {
   const [interactionId, setInteractionId] = useState(null);
@@ -201,6 +202,12 @@ export default function useAgent({ onExpandFull } = {}) {
       parameters,
       interaction_id: interactionId,
     };
+    // 테스트용: method가 EXECUTION일 때 readyToExecute를 바로 처리
+    if (method.toUpperCase() === 'EXECUTION') {
+      route(readyToExecute);
+      return Promise.resolve(readyToExecute);
+    }
+
     return call(payload); // POST /api/v1/userInputRe/
   };
 
