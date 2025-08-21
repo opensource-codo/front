@@ -164,7 +164,7 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
           onKeyDown={onKeyDown}
           disabled={loading}
         />
-        <button className="send-button" onClick={() => sendMessage('GUIDE')} disabled={loading}>
+        <button className="send-button" onClick={() => sendMessage()} disabled={loading}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -174,24 +174,24 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
       </div>
 
       <div className="suggestion-buttons">
-  <button
-    onClick={handleShortcutGuide}
-    className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
-    aria-pressed={mode === 'GUIDE'}
-    disabled={loading}            
-  >
-    ⌨️ 단축키 안내
-  </button>
+        <button
+          onClick={handleShortcutGuide}
+          className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
+          aria-pressed={mode === 'GUIDE'}
+          disabled={loading}            
+        >
+          ⌨️ 단축키 안내
+        </button>
 
-  <button
-    onClick={handleAutoExecution}
-    className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
-    aria-pressed={mode === 'EXECUTION'}
-    disabled={loading}
-  >
-    ⚡ 자동 실행
-  </button>
-</div>
+        <button
+          onClick={handleAutoExecution}
+          className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
+          aria-pressed={mode === 'EXECUTION'}
+          disabled={loading}
+        >
+          ⚡ 자동 실행
+        </button>
+      </div>
     </div>
   );
 }
