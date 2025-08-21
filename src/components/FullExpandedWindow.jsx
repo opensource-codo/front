@@ -30,22 +30,35 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
     }, [messages, ui, agentLoading,guideHistory]);
 
+
+    //
     useEffect(() => {
-        if (!ui?.guide) return;
+    if (!ui?.guide) return;
 
-        const msg = ui.guide.message ?? ui.guide.text ?? ui.guide.content ?? '';
-        const shortcut = ui.guide.shortcut ?? ui.guide.shortCut ?? ui.guide.hotkey ?? '-';
-        if (!msg) return;
+    const msg = ui.guide.message || '';
+    const shortcut = ui.guide.shortcut || '-';
+    
+    if (!msg) return;
 
-        const guideKey = ui.guide.interaction_id ?? `${msg}||${shortcut}`;
-        if (lastGuideKeyRef.current === guideKey) return;
-        lastGuideKeyRef.current = guideKey;
+    const guideKey = ui.guide.interaction_id || `${msg}||${shortcut}`;
+    
+    if (lastGuideKeyRef.current === guideKey) return;
+    lastGuideKeyRef.current = guideKey;
 
-        setGuideHistory(prev => [
-            ...prev,
-            { id: guideKey, type: 'guide', from: 'bot', text: msg, shortcut, ts: Date.now() },
-        ]);
-        }, [ui?.guide]);
+    setGuideHistory(prev => [
+        ...prev,
+        { 
+            id: guideKey, 
+            type: 'guide', 
+            from: 'bot', 
+            text: msg, 
+            shortcut, 
+            ts: Date.now() 
+        },
+    ]);
+}, [ui?.guide]);
+
+
 
     // 자주 쓰는 기능 데이터 가져오기
     const fetchFrequentFunctions = async () => {
@@ -89,6 +102,17 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         setActiveMenu('home'); // 홈 메뉴 활성화
     };
 
+    const handleSuggestionClick = (suggestion) => {
+        if (suggestion === '단축키 안내') {
+            setMode('GUIDE');
+        } else if (suggestion === '자동 실행') {
+            setMode('EXECUTION');
+        } else {
+            setInputText(suggestion);
+        }
+    };
+    
+
     const sendMessage = async (method = mode, overrideText) => {
         const text = (overrideText ?? inputText).trim();
         if (!text || agentLoading) return;
@@ -106,16 +130,6 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         }
     };
 
-    const handleSuggestionClick = (suggestion) => {
-        if (suggestion === '단축키 안내') {
-            setMode('GUIDE');
-        } else if (suggestion === '자동 실행') {
-            setMode('EXECUTION');
-        } else {
-            setInputText(suggestion);
-        }
-    };
-    
 
     return (
         <div className='full-expanded-window'>

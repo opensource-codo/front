@@ -11,6 +11,8 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
   const [inputText, setInputText] = useState('');
   const [mode, setMode] = useState('GUIDE');
   const bodyRef = useRef(null);
+  const [guideHistory, setGuideHistory] = useState([]);
+  const lastGuideKeyRef = useRef(null);
 
   // agent prop에서 필요한 값들을 가져오기
   const {
@@ -21,8 +23,34 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, ui, loading]);
+  }, [messages, ui, loading,guideHistory]);
 
+  // 가이드 히스토리 관리
+  useEffect(() => {
+    if (!ui?.guide) return;
+
+    const msg = ui.guide.message || '';
+    const shortcut = ui.guide.shortcut || '-';
+    
+    if (!msg) return;
+
+    const guideKey = ui.guide.interaction_id || `${msg}||${shortcut}`;
+    
+    if (lastGuideKeyRef.current === guideKey) return;
+    lastGuideKeyRef.current = guideKey;
+
+    setGuideHistory(prev => [
+      ...prev,
+      {
+        id: guideKey,
+        type: 'guide',
+        from: 'bot',
+        text: msg,
+        shortcut,
+        ts: Date.now()
+      },
+    ]);
+  }, [ui?.guide]);
 
   //전송 함수
   const sendMessage = async (method = mode, overrideText) => {
@@ -69,16 +97,18 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
         ))}
 
         {/* GUIDE 카드 */}
-        {ui.guide && (
-          <div className="card">
-            <div style={{ marginBottom: 6 }}>
-              <b>단축키:</b> {ui.guide.shortcut || '-'}
+        {guideHistory.map((g) => (
+            <div key={g.id} className="message guide">
+              <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                단축키: {g.shortcut}
+              </div>
+              <div style={{ whiteSpace: 'pre-wrap' }}>{g.text}</div>
+
+              <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="send-button" onClick={goToExecution}>실행으로 전환</button>
+              </div>
             </div>
-            <button className="send-button" onClick={goToExecution}>
-              실행으로 전환
-            </button>
-          </div>
-        )}
+          ))}
 
         {/* 누락 파라미터 폼 */}
         {ui.missing && (
