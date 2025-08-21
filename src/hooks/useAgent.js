@@ -62,11 +62,13 @@ export default function useAgent({ onExpandFull } = {}) {
 
 
   const runLocalPython = async ({ command, timeoutMs = 15000 }) => {
-    const scriptPath = `Scripts/${command}.py`;
+    // 절대경로 지정  
+    const scriptPath = `C:/Users/JH/coding/project/backend/frontend/front/Scripts/${command}.py`;
+
     if (isElectron() && window.native?.runPython) {
       return await window.native.runPython({ scriptPath, args: [], timeoutMs });
     }
-    // 브라우저 환경(또는 preload 미노출) → 실행은 하지 않고 안내만
+
     addBotMessage(`⚠️ Electron 환경이 아니라 로컬 실행이 불가합니다.\n수동 실행: \`${scriptPath}\``);
     return { ok: false, code: -1, stdout: '', stderr: 'Electron bridge missing' };
   };
@@ -105,11 +107,17 @@ export default function useAgent({ onExpandFull } = {}) {
       }
 
       case 'ready_to_execute': {
+        console.log('isElectron?', typeof window.process?.type !== 'undefined');
+        console.log('window.native =', window.native);
+        console.log('keys(window.native) =', window.native ? Object.keys(window.native) : null);
+        console.log('typeof window.native?.runPython =', typeof window.native?.runPython);
+
         // 안내 토스트
         next.toast = { type: 'info', text: data.message || '실행 준비가 완료되었습니다.' };
 
         // 실행: exec.payload.command 가 곧 파일명 (Scripts/<command>.py)
-        const command = data?.exec?.payload?.command;
+        // const command = data?.exec?.payload?.command;
+        const command = "mute_toggle"
         const timeoutMs = data?.exec?.timeoutMs ?? 15000;
 
         if (!command) {

@@ -1,6 +1,7 @@
 // main.js (루트)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process'); // ★ 반드시 추가
 
 const isDev = !app.isPackaged;
 
@@ -29,42 +30,28 @@ function createWindow() {
 }
 
 
-ipcMain.handle('run-python', async (_event, { scriptPath, args = [], pythonBin = 'python', timeoutMs = 15000 }) => {
+ipcMain.handle('native:run-python', async (_evt, { scriptPath, args = [], timeoutMs = 15000 }) => {
+  const baseDir = app.isPackaged ? process.resourcesPath : app.getAppPath();
+  const absScript = path.resolve(baseDir, scriptPath);
+  const pythonExe = process.env.CONDA_PYTHON_EXE || 'python';
+
   return new Promise((resolve) => {
-    try {
-      // Scripts 폴더 기준 절대 경로로 고정
-      const absScript = path.isAbsolute(scriptPath)
-        ? scriptPath
-        : path.join(process.cwd(), 'Scripts', scriptPath); // 예: 'enable_wifi.py'
+    const child = spawn(pythonExe, [absScript, ...args], { windowsHide: true });
 
-      const ps = spawn(pythonBin, [absScript, ...args], { shell: false });
+    let stdout = '', stderr = '';
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL');
+      resolve({ ok: false, code: -1, stdout, stderr: `timeout ${timeoutMs}ms` });
+    }, timeoutMs);
 
-      let stdout = '';
-      let stderr = '';
-
-      const killTimer = setTimeout(() => {
-        try { ps.kill('SIGKILL'); } catch {}
-        resolve({ ok: false, code: -1, stdout, stderr: `${stderr}\n[timeout] ${timeoutMs}ms` });
-      }, timeoutMs);
-
-      ps.stdout.on('data', (d) => (stdout += d.toString()));
-      ps.stderr.on('data', (d) => (stderr += d.toString()));
-
-      ps.on('error', (err) => {
-        clearTimeout(killTimer);
-        resolve({ ok: false, code: -1, stdout, stderr: String(err) });
-      });
-
-      ps.on('close', (code) => {
-        clearTimeout(killTimer);
-        resolve({ ok: code === 0, code, stdout, stderr });
-      });
-    } catch (e) {
-      resolve({ ok: false, code: -1, stdout: '', stderr: String(e) });
-    }
+    child.stdout.on('data', d => stdout += d.toString());
+    child.stderr.on('data', d => stderr += d.toString());
+    child.on('close', code => {
+      clearTimeout(timer);
+      resolve({ ok: code === 0, code, stdout, stderr });
+    });
   });
-});
-
+}); 
 
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => {
