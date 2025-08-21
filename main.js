@@ -17,8 +17,6 @@ function createWindow() {
       nodeIntegration: false,
     }
   });
-  win.setPosition(20,40);
-  win.show();
 
 
   if (isDev) {

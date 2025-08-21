@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import minimizeIcon from '../assets/minimize.png';
 import closeIcon from '../assets/close.png';
-import arrowSubmit from '../assets/arrow-submit.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
 import useAgent from '../hooks/useAgent';
@@ -15,6 +14,9 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [frequentFunctions, setFrequentFunctions] = useState([]);
     const [recentFunctions, setRecentFunctions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [guideHistory, setGuideHistory] = useState([]);
+    const lastGuideKeyRef = useRef(null);
+
 
     const bodyRef = useRef(null);
 
@@ -27,7 +29,33 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
 
     useEffect(() => {
         bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
-    }, [messages, ui, agentLoading]);
+    }, [messages, ui, agentLoading,guideHistory]);
+
+    // ✅ 반드시 useEffect로 감싸기
+useEffect(() => {
+  if (!ui?.guide?.message) return;
+
+  const guideKey =
+    ui.guide.interaction_id ||
+    `${ui.guide.message}||${ui.guide.shortcut || ''}`;
+
+  if (lastGuideKeyRef.current === guideKey) return; // 중복 방지
+  lastGuideKeyRef.current = guideKey;
+
+  setGuideHistory(prev => [
+    ...prev,
+    {
+      id: guideKey,
+      type: 'guide',
+      from: 'bot',
+      text: ui.guide.message,
+      shortcut: ui.guide.shortcut || '-',
+      ts: Date.now(),
+    },
+  ]);
+// 👇 의존성 배열 포함
+}, [ui?.guide?.message, ui?.guide?.shortcut, ui?.guide?.interaction_id]);
+
 
     // 자주 쓰는 기능 데이터 가져오기
     const fetchFrequentFunctions = async () => {
@@ -97,6 +125,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
             setInputText(suggestion);
         }
     };
+    
 
     return (
         <div className='full-expanded-window'>
@@ -141,16 +170,19 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                             ))}
 
                             {/* GUIDE 카드 */}
-                            {ui.guide && (
-                                <div className="card">
-                                    <div style={{ marginBottom: 6 }}>
-                                        <b>단축키:</b> {ui.guide.shortcut || '-'}
+                            {guideHistory.map((g) => (
+                                <div key={g.id} className="message guide">
+                                    <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                                    단축키: {g.shortcut}
                                     </div>
-                                    <button className="send-button" onClick={goToExecution}>
-                                        실행으로 전환
-                                    </button>
+                                    <div style={{ whiteSpace: 'pre-wrap' }}>{g.text}</div>
+
+                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                                    <button className="send-button" onClick={goToExecution}>실행으로 전환</button>
+                                    </div>
                                 </div>
-                            )}
+                                ))}
+                            
 
                             {/* 누락 파라미터 폼 */}
                             {ui.missing && (
