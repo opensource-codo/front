@@ -9,7 +9,7 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
   
   //상태 선언 
   const [inputText, setInputText] = useState('');
-
+  const [mode, setMode] = useState('GUIDE');
   const bodyRef = useRef(null);
 
   // agent prop에서 필요한 값들을 가져오기
@@ -25,12 +25,13 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
 
 
   //전송 함수
-  const sendMessage = async (method = "GUIDE", overrideText) => {
+  const sendMessage = async (method = mode, overrideText) => {
 
     const text = (overrideText ?? inputText).trim();
     if (!text || loading) return;
 
     setInputText('');
+
 
     //서버 호출 (useAgent의 send에서 자동으로 메시지 추가됨)
     await send({ text, method });
@@ -40,18 +41,18 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
   const onKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage('GUIDE');
+      sendMessage(mode);
     }
   };
 
    // "단축키 안내" / "자동 실행" 버튼
   const handleShortcutGuide = (suggestion) => {
-      sendMessage('GUIDE');
+      setMode('GUIDE');
     
   };
 
   const handleAutoExecution = () => {
-    sendMessage('EXECUTION');
+    setMode('EXECUTION');
   };
 
   return (
@@ -143,15 +144,24 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
       </div>
 
       <div className="suggestion-buttons">
-        <button onClick={handleShortcutGuide} className="suggestion-button"
-        disabled={loading || !inputText.trim()}>
-          ⌨️ 단축키 안내
-        </button>
-        <button onClick={handleAutoExecution} className="suggestion-button"
-        disabled={loading || !inputText.trim()}>
-          ⚡ 자동 실행
-        </button>
-      </div>
+  <button
+    onClick={handleShortcutGuide}
+    className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
+    aria-pressed={mode === 'GUIDE'}
+    disabled={loading}            
+  >
+    ⌨️ 단축키 안내
+  </button>
+
+  <button
+    onClick={handleAutoExecution}
+    className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
+    aria-pressed={mode === 'EXECUTION'}
+    disabled={loading}
+  >
+    ⚡ 자동 실행
+  </button>
+</div>
     </div>
   );
 }

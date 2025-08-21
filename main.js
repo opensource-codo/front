@@ -17,6 +17,9 @@ function createWindow() {
       nodeIntegration: false,
     }
   });
+  win.setPosition(20,40);
+  win.show();
+
 
   if (isDev) {
     win.loadURL('http://localhost:3000'); // CRA dev 서버

@@ -1,4 +1,5 @@
 .full-expanded-window {
+  position: relative;
   display: flex;
   width: 900px;
   height: 900px;
@@ -91,7 +92,7 @@
   color: var(--text-secondary);
   padding: 16px;
   border-radius: var(--radius-lg);
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
 }
@@ -279,16 +280,16 @@
 }
 
 .input-container {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1) !important;
   border: 2px solid var(--border-color);
   border-radius: var(--radius-2xl);
-  padding: 24px;
+  padding: 12px;
   width: 100%;
   max-width: 800px;
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   backdrop-filter: blur(10px);
 }
@@ -351,6 +352,30 @@
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
+
+/* ✅ 제안 버튼 활성(선택) 상태 */
+.suggestions-buttons button.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 활성 상태일 때 hover 과도 변화 방지(선택감 유지) */
+.suggestions-buttons button.active:hover {
+  transform: none;
+  filter: brightness(0.98);
+}
+
+/* 비활성 상태만 hover 시 강조 */
+.suggestions-buttons button:not(.active):hover {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
 
 .submit-button {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));

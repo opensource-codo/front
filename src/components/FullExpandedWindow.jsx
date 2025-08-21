@@ -9,6 +9,7 @@ import useAgent from '../hooks/useAgent';
 
 function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [inputText, setInputText] = useState('');
+    const [mode, setMode] = useState('GUIDE'); 
 
     const [activeMenu, setActiveMenu] = useState('home'); // 활성 메뉴 상태 추가
     const [frequentFunctions, setFrequentFunctions] = useState([]);
@@ -70,7 +71,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         setActiveMenu('home'); // 홈 메뉴 활성화
     };
 
-    const sendMessage = async (method = "GUIDE", overrideText) => {
+    const sendMessage = async (method = mode, overrideText) => {
         const text = (overrideText ?? inputText).trim();
         if (!text || agentLoading) return;
 
@@ -83,15 +84,15 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const onKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage('GUIDE');
+            sendMessage(mode);
         }
     };
 
     const handleSuggestionClick = (suggestion) => {
         if (suggestion === '단축키 안내') {
-            sendMessage('GUIDE',);
+            setMode('GUIDE');
         } else if (suggestion === '자동 실행') {
-            sendMessage('EXECUTION');
+            setMode('EXECUTION');
         } else {
             setInputText(suggestion);
         }
@@ -100,7 +101,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
     return (
         <div className='full-expanded-window'>
             <aside className='sidebar'>
-                <div className='logo' onClick={goHome} style={{ cursor: 'pointer' }}>
+                <div className='logo' onClick={onClose} style={{ cursor: 'pointer' }}>
                     <img src={codoIcon} alt="CODO Icon" className="logo-icon" />
                     CODO
                 </div>
@@ -207,7 +208,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                         onKeyDown={onKeyDown}
                                         disabled={agentLoading}
                                     />
-                                    <button className="send-button" onClick={() => sendMessage('GUIDE')} disabled={agentLoading}>
+                                    <button className="send-button" onClick={() => sendMessage(mode)} disabled={agentLoading}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -218,11 +219,16 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
 
                                 <div className='suggestions-buttons'>
                                     <button onClick={() => handleSuggestionClick('단축키 안내')} 
-                                        disabled={agentLoading || !inputText.trim()}>
+                                    className={`${mode === 'GUIDE' ? 'active' : ''}`} 
+                                    aria-pressed={mode === 'GUIDE'} disabled={agentLoading} >
                                         ⌨️ 단축키 안내
                                     </button>
-                                    <button onClick={() => handleSuggestionClick('자동 실행')}
-                                        disabled={agentLoading || !inputText.trim()}>
+                                    <button
+                                        onClick={() => handleSuggestionClick('자동 실행')}
+                                        className={`suggestions-button ${mode === 'EXECUTION' ? 'active' : ''}`}
+                                        aria-pressed={mode === 'EXECUTION'}
+                                        disabled={agentLoading}
+                                    >
                                         ⚡ 자동 실행
                                     </button>
                                 </div>

@@ -3,15 +3,15 @@
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  width: 800px;
-  height: 280px;
+  width: 460px;
+  height: 620px;
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
-  padding: 24px 0 24px 0;
+  justify-content: flex-start; 
+  padding: 24px 0 16px 0;
   border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
 }
@@ -43,14 +43,15 @@
 .body { 
   display: flex;
   flex-direction: column;
-  justify-content: center; 
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  padding: 20px 24px;
+  justify-content: flex-end; 
+  align-items: stretch;
+  text-align: left;
+  gap: 8px;
+  padding: 20px 24px 10px 24px;
   overflow-y: auto; 
   flex-grow: 1;
   min-height: 100px;
+  padding-bottom: 0;
 }
 
 .body h2 {
@@ -102,14 +103,15 @@
 .chat-input-area {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: 8px;
+  padding: 8px 12px;
   background-color: rgba(248, 250, 252, 0.7);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  margin: 0 24px;
+  border-radius: var(--radius-lg);
+  margin: 0 16px;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 0;
 }
 
 .chat-input-area:focus-within {
@@ -119,7 +121,7 @@
 
 .chat-input {
   flex: 1;
-  padding: 12px 16px;
+  padding: 6px 8px;
   border-radius: var(--radius-lg);
   border: none;
   outline: none;
@@ -189,6 +191,29 @@
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
+
+.suggestion-button.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.suggestion-button.active:hover {
+  transform: none;              /* 선택 상태 유지감 */
+  filter: brightness(0.98);
+}
+
+/* 선택되지 않은 버튼만 hover 시 강조 */
+.suggestion-button:not(.active):hover {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+
 
 .card {
   width: 100%;
@@ -313,3 +338,7 @@
   font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
   line-style: 1.4;
 }
+
+.body .message:last-child { margin-bottom: 0; }
+
+.message, .message * { line-height: 1.4; }
