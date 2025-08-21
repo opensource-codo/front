@@ -45,14 +45,13 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
   };
 
    // "단축키 안내" / "자동 실행" 버튼
-  const handleShortcutGuide = () => {
-    setInputText('단축키 안내');
-    sendMessage('GUIDE', '단축키 안내');
+  const handleShortcutGuide = (suggestion) => {
+      sendMessage('GUIDE');
+    
   };
 
   const handleAutoExecution = () => {
-    setInputText('자동 실행');
-    sendMessage('EXECUTION', '자동 실행');
+    sendMessage('EXECUTION');
   };
 
   return (
@@ -144,10 +143,12 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
       </div>
 
       <div className="suggestion-buttons">
-        <button onClick={handleShortcutGuide} className="suggestion-button">
+        <button onClick={handleShortcutGuide} className="suggestion-button"
+        disabled={loading || !inputText.trim()}>
           ⌨️ 단축키 안내
         </button>
-        <button onClick={handleAutoExecution} className="suggestion-button">
+        <button onClick={handleAutoExecution} className="suggestion-button"
+        disabled={loading || !inputText.trim()}>
           ⚡ 자동 실행
         </button>
       </div>
