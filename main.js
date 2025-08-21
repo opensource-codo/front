@@ -18,6 +18,8 @@ function createWindow() {
     }
   });
 
+  win.setIgnoreMouseEvents(true, { forward: true });
+
 
   if (isDev) {
     win.loadURL('http://localhost:3000'); // CRA dev 서버

@@ -14,6 +14,7 @@
   padding: 24px 0 16px 0;
   border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
+  pointer-events: auto;  
 }
 
 .header {

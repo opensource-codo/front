@@ -2,6 +2,11 @@ html, body, #root {
   background: transparent !important; 
 }
 
+.app-root {
+  position: fixed; inset: 0;
+  pointer-events: none;   /* ← 기본은 클릭 통과 */
+}
+
 :root {
   --primary-color: #6366f1;
   --primary-hover: #4f46e5;
