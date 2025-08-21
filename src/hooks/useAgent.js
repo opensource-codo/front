@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import readyToExecute from '../ready_to_execute.json';
+import readyToExecute from './ready_to_execute.json';
 
 export default function useAgent({ onExpandFull } = {}) {
   const [interactionId, setInteractionId] = useState(null);
