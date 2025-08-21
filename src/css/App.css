@@ -1,5 +1,5 @@
 html, body, #root {
-  background: transparent !important;  /* Electron transparent 창과 맞물림 */
+  background: transparent !important; 
 }
 
 :root {

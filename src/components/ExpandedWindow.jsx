@@ -87,7 +87,7 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
             required={ui.missing.required}
             onSubmit={async (filled) => {
               const data = await submitMissingParams(filled);
-              // setMessages(prev => [...prev, { from: 'bot', text: data?.message || '(메시지 없음)' }]); // useAgent에서 처리
+            
             }}
           />
         )}
@@ -101,11 +101,9 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
               <div className="modal-actions">
                 <button className="send-button" onClick={async () => {
                   const data = await confirmExecution();
-                  // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // useAgent에서 처리
                 }}>확인</button>
                 <button className="secondary-button" onClick={async () => {
                   const data = await cancelExecution();
-                  // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // useAgent에서 처리
                 }}>취소</button>
               </div>
             </div>

@@ -1,15 +1,3 @@
-/* 한글 폰트 지원 - 강화 */
-* {
-  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
-  font-display: swap;
-}
-
-/* 메시지 텍스트에 특별히 한글 폰트 적용 */
-.message, .message * {
-  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
-  line-style: 1.4;
-}
-
 .expanded-window {
   position: fixed;
   top: 10%;
@@ -312,4 +300,16 @@
   display: inline-flex;
   align-self: center;
   width: auto;
+}
+
+/* 한글 폰트 지원 - 강화 */
+* {
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+  font-display: swap;
+}
+
+/* 메시지 텍스트에 특별히 한글 폰트 적용 */
+.message, .message * {
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
+  line-style: 1.4;
 }

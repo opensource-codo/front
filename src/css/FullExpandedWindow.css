@@ -1,8 +1,3 @@
-/* 한글 폰트 지원 */
-* {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Malgun Gothic', '맑은 고딕', sans-serif;
-}
-
 .full-expanded-window {
   display: flex;
   width: 900px;
@@ -538,5 +533,10 @@
 .recent-function-item {
   background-color: rgba(248, 250, 252, 0.7) !important; /* expanded와 유사 */
   border: 1px solid var(--border-color);
-  backdrop-filter: none; /* 여기엔 보통 blur 안 줌 */
+  backdrop-filter: none; 
+}
+
+/* 한글 폰트 지원 */
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Malgun Gothic', '맑은 고딕', sans-serif;
 }

@@ -63,9 +63,6 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
 
     // 홈으로 돌아가는 함수
     const goHome = () => {
-        // setMessages([ // This line was removed as per the edit hint
-        //     { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
-        // ]);
         setInputText('');
         setActiveMenu('home'); // 홈 메뉴 활성화
     };
@@ -163,7 +160,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                     required={ui.missing.required}
                                     onSubmit={async (filled) => {
                                         const data = await submitMissingParams(filled);
-                                        // setMessages(prev => [...prev, { from: 'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                                        
                                     }}
                                 />
                             )}
@@ -177,11 +174,11 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                         <div className="modal-actions">
                                             <button className="send-button" onClick={async () => {
                                                 const data = await confirmExecution();
-                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                
                                             }}>확인</button>
                                             <button className="secondary-button" onClick={async () => {
                                                 const data = await cancelExecution();
-                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
+                                        
                                             }}>취소</button>
                                         </div>
                                     </div>
