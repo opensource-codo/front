@@ -18,7 +18,9 @@ function createWindow() {
     }
   });
 
-  win.setIgnoreMouseEvents(true, { forward: true });
+   win.setIgnoreMouseEvents(false);
+
+  
 
 
   if (isDev) {

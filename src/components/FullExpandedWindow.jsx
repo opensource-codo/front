@@ -4,7 +4,6 @@ import minimizeIcon from '../assets/minimize.png';
 import closeIcon from '../assets/close.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
-import useAgent from '../hooks/useAgent';
 
 function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [inputText, setInputText] = useState('');
@@ -31,31 +30,22 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
     }, [messages, ui, agentLoading,guideHistory]);
 
-    // ✅ 반드시 useEffect로 감싸기
-useEffect(() => {
-  if (!ui?.guide?.message) return;
+    useEffect(() => {
+        if (!ui?.guide) return;
 
-  const guideKey =
-    ui.guide.interaction_id ||
-    `${ui.guide.message}||${ui.guide.shortcut || ''}`;
+        const msg = ui.guide.message ?? ui.guide.text ?? ui.guide.content ?? '';
+        const shortcut = ui.guide.shortcut ?? ui.guide.shortCut ?? ui.guide.hotkey ?? '-';
+        if (!msg) return;
 
-  if (lastGuideKeyRef.current === guideKey) return; // 중복 방지
-  lastGuideKeyRef.current = guideKey;
+        const guideKey = ui.guide.interaction_id ?? `${msg}||${shortcut}`;
+        if (lastGuideKeyRef.current === guideKey) return;
+        lastGuideKeyRef.current = guideKey;
 
-  setGuideHistory(prev => [
-    ...prev,
-    {
-      id: guideKey,
-      type: 'guide',
-      from: 'bot',
-      text: ui.guide.message,
-      shortcut: ui.guide.shortcut || '-',
-      ts: Date.now(),
-    },
-  ]);
-// 👇 의존성 배열 포함
-}, [ui?.guide?.message, ui?.guide?.shortcut, ui?.guide?.interaction_id]);
-
+        setGuideHistory(prev => [
+            ...prev,
+            { id: guideKey, type: 'guide', from: 'bot', text: msg, shortcut, ts: Date.now() },
+        ]);
+        }, [ui?.guide]);
 
     // 자주 쓰는 기능 데이터 가져오기
     const fetchFrequentFunctions = async () => {
