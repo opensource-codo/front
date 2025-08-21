@@ -53,6 +53,24 @@ export default function useAgent({ onExpandFull } = {}) {
     addMessage(text, 'system', { markdown: false });
   };
 
+  const isElectron = () =>
+    typeof window !== "undefined" &&
+    !!(
+      window.process?.versions?.electron ||
+      window.navigator?.userAgent?.toLowerCase().includes("electron")
+  );
+
+
+  const runLocalPython = async ({ command, timeoutMs = 15000 }) => {
+    const scriptPath = `Scripts/${command}.py`;
+    if (isElectron() && window.native?.runPython) {
+      return await window.native.runPython({ scriptPath, args: [], timeoutMs });
+    }
+    // 브라우저 환경(또는 preload 미노출) → 실행은 하지 않고 안내만
+    addBotMessage(`⚠️ Electron 환경이 아니라 로컬 실행이 불가합니다.\n수동 실행: \`${scriptPath}\``);
+    return { ok: false, code: -1, stdout: '', stderr: 'Electron bridge missing' };
+  };
+
   const route = (data) => {
     setLastResponse(data);
 
@@ -87,10 +105,39 @@ export default function useAgent({ onExpandFull } = {}) {
       }
 
       case 'ready_to_execute': {
-        // 선택: UX상 알림만. 필요 시 confirm과 동일 동작으로 바꿔도 됨.
+        // 안내 토스트
         next.toast = { type: 'info', text: data.message || '실행 준비가 완료되었습니다.' };
-      
-        
+
+        // 실행: exec.payload.command 가 곧 파일명 (Scripts/<command>.py)
+        const command = data?.exec?.payload?.command;
+        const timeoutMs = data?.exec?.timeoutMs ?? 15000;
+
+        if (!command) {
+          addBotMessage('⚠️ 실행할 command가 없습니다.');
+          break;
+        }
+
+        // 비동기 실행 (route는 sync이므로 IIFE 사용)
+        (async () => {
+          try {
+            const res = await runLocalPython({ command, timeoutMs });
+            addBotMessage(
+              [
+                `**로컬 실행**: \`Scripts/${command}.py\``,
+                res.ok ? '✅ 성공' : '❌ 실패',
+                res.stdout ? `\n**stdout**\n\`\`\`\n${res.stdout}\n\`\`\`` : '',
+                res.stderr ? `\n**stderr**\n\`\`\`\n${res.stderr}\n\`\`\`` : '',
+              ].join('\n')
+            );
+            onExpandFullRef.current?.();
+          } catch (e) {
+            addBotMessage(`**실행 실패**: ${String(e)}`);
+            setUi((prev) => ({
+              ...prev,
+              error: { message: '로컬 실행 실패', details: [String(e)] },
+            }));
+          }
+        })();
 
         break;
       }
