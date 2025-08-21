@@ -24,7 +24,8 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const {
         ui, loading: agentLoading, messages,
         send, goToExecution, submitMissingParams,
-        confirmExecution, cancelExecution
+        confirmExecution, cancelExecution,
+        cancelConfirmationPrompt,
     } = agent;
 
     useEffect(() => {
@@ -192,7 +193,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                                 // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
                                             }}>확인</button>
                                             <button className="secondary-button" onClick={async () => {
-                                                const data = await cancelExecution();
+                                                const data = await cancelConfirmationPrompt();
                                                 // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
                                             }}>취소</button>
                                         </div>

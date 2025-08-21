@@ -30,7 +30,9 @@ export default function useAgent({ onExpandFull } = {}) {
   }, [onExpandFull]);
 
   const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-  const ENDPOINT = '/api/v1/userInputRe/';
+  const INPUT_ENDPOINT = '/api/v1/userInputRe/';
+  const CONTINUE_ENDPOINT = '/api/v1/continue';
+  const CONFIRM_ENDPOINT = '/api/v1/continue';
 
   const addMessage = (text, type = 'user', {markdown=false} = {}) => {
     const newMessage = {
@@ -54,7 +56,6 @@ export default function useAgent({ onExpandFull } = {}) {
   const route = (data) => {
     setLastResponse(data);
 
-    // ✅ interaction_Id -> interaction_id
     if (data?.interaction_id) setInteractionId(data.interaction_id);
 
     const next = {
@@ -88,6 +89,9 @@ export default function useAgent({ onExpandFull } = {}) {
       case 'ready_to_execute': {
         // 선택: UX상 알림만. 필요 시 confirm과 동일 동작으로 바꿔도 됨.
         next.toast = { type: 'info', text: data.message || '실행 준비가 완료되었습니다.' };
+      
+        
+
         break;
       }
 
@@ -125,13 +129,24 @@ export default function useAgent({ onExpandFull } = {}) {
         break;
     }
 
+    if (data?.requires_confirmation === true) {
+      // 백엔드가 intent/parameters를 안 줄 수도 있으니 안전하게 채움
+      addBotMessage(data.intent+' 실행');
+      next.confirm = {
+        intent: data.intent || 'execute',
+        params: data.parameters || {},
+        // 추가로, 어떤 이유로 확인이 필요한지 메시지가 있으면 meta로 담아둘 수도 있음
+        meta: { requires_confirmation: true },
+      };
+    }
+
     setUi(next);
   };
 
   const call = async (payload) => {
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}${ENDPOINT}`, payload);
+      const res = await axios.post(`${API_URL}${INPUT_ENDPOINT}`, payload);
       route(res.data);
       return res.data;
     } catch (e) {
@@ -178,11 +193,32 @@ export default function useAgent({ onExpandFull } = {}) {
     });
 
   // 확인 / 취소
-  const confirmExecution = () =>
-    call({ ...lastResponse, method: 'EXECUTION', confirm: true, interaction_id: interactionId });
+  const confirmExecution = () => continueExecution({ parameters: ui?.confirm?.params, method: 'EXECUTION' });
+
+  // const confirmExecution = () =>
+  //   call({ ...lastResponse, method: 'EXECUTION', confirm: true, interaction_id: interactionId });
 
   const cancelExecution = () =>
     call({ ...lastResponse, method: 'EXECUTION', cancel: true, interaction_id: interactionId });
+  
+  const continueExecution = ({ parameters = {}, text = null, method = 'EXECUTION' } = {}) => {
+    const mergedParams = {
+      ...(lastResponse?.parameters || {}),
+      ...(parameters || {}),
+    };
+    const payload = {
+      interaction_id: interactionId || lastResponse?.interaction_id,
+      parameters: mergedParams,
+      method: String(method).toUpperCase(), // EXECUTION
+    };
+    if (text != null) payload.text = text;
+
+    return call(CONTINUE_ENDPOINT, payload);
+  };
+
+  const cancelConfirmationPrompt = () => {
+    setUi((prev) => ({ ...prev, confirm: null, toast: { type: 'info', text: '사용자 취소' } }));
+  };
 
   return {
     interactionId,
@@ -198,5 +234,6 @@ export default function useAgent({ onExpandFull } = {}) {
     submitMissingParams,
     confirmExecution,
     cancelExecution,
+    cancelConfirmationPrompt
   };
 }
