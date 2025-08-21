@@ -63,6 +63,9 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
 
     // 홈으로 돌아가는 함수
     const goHome = () => {
+        // setMessages([ // This line was removed as per the edit hint
+        //     { from: 'system', text: '안녕하세요! 무엇을 도와드릴까요?' }
+        // ]);
         setInputText('');
         setActiveMenu('home'); // 홈 메뉴 활성화
     };
@@ -86,9 +89,9 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
 
     const handleSuggestionClick = (suggestion) => {
         if (suggestion === '단축키 안내') {
-            sendMessage('GUIDE', '단축키 안내');
+            sendMessage('GUIDE',);
         } else if (suggestion === '자동 실행') {
-            sendMessage('EXECUTION', '자동 실행');
+            sendMessage('EXECUTION');
         } else {
             setInputText(suggestion);
         }
@@ -110,12 +113,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                         📌 자주 쓰는 기능
                     </button>
                     <button className={`menu-item ${activeMenu === 'settings' ? 'active' : ''}`}>⚙️ 설정</button>
-                    <button 
-                        className={`menu-item ${activeMenu === 'home' ? 'active' : ''}`}
-                        onClick={goHome}
-                    >
-                        🏠 홈
-                    </button>
+                    <button className={`menu-item ${activeMenu === 'home' ? 'active' : ''}`}>🏠 홈</button>
                 </nav>
 
                 <div className="spacer" />
@@ -160,7 +158,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                     required={ui.missing.required}
                                     onSubmit={async (filled) => {
                                         const data = await submitMissingParams(filled);
-                                        
+            
                                     }}
                                 />
                             )}
@@ -174,11 +172,11 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                         <div className="modal-actions">
                                             <button className="send-button" onClick={async () => {
                                                 const data = await confirmExecution();
-                
+                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
                                             }}>확인</button>
                                             <button className="secondary-button" onClick={async () => {
                                                 const data = await cancelExecution();
-                                        
+                                                // setMessages(prev => [...prev, { from:'bot', text: data?.message || '(메시지 없음)' }]); // This line was removed as per the edit hint
                                             }}>취소</button>
                                         </div>
                                     </div>
@@ -219,10 +217,12 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                                 </div>
 
                                 <div className='suggestions-buttons'>
-                                    <button onClick={() => handleSuggestionClick('단축키 안내')}>
+                                    <button onClick={() => handleSuggestionClick('단축키 안내')} 
+                                        disabled={agentLoading || !inputText.trim()}>
                                         ⌨️ 단축키 안내
                                     </button>
-                                    <button onClick={() => handleSuggestionClick('자동 실행')}>
+                                    <button onClick={() => handleSuggestionClick('자동 실행')}
+                                        disabled={agentLoading || !inputText.trim()}>
                                         ⚡ 자동 실행
                                     </button>
                                 </div>
