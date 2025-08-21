@@ -144,24 +144,24 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
       </div>
 
       <div className="suggestion-buttons">
-  <button
-    onClick={handleShortcutGuide}
-    className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
-    aria-pressed={mode === 'GUIDE'}
-    disabled={loading}            
-  >
-    ⌨️ 단축키 안내
-  </button>
+        <button
+          onClick={handleShortcutGuide}
+          className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
+          aria-pressed={mode === 'GUIDE'}
+          disabled={loading}            
+        >
+          ⌨️ 단축키 안내
+        </button>
 
-  <button
-    onClick={handleAutoExecution}
-    className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
-    aria-pressed={mode === 'EXECUTION'}
-    disabled={loading}
-  >
-    ⚡ 자동 실행
-  </button>
-</div>
+        <button
+          onClick={handleAutoExecution}
+          className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
+          aria-pressed={mode === 'EXECUTION'}
+          disabled={loading}
+        >
+          ⚡ 자동 실행
+        </button>
+      </div>
     </div>
   );
 }
