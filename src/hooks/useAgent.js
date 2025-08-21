@@ -11,6 +11,7 @@ export default function useAgent({ onExpandFull } = {}) {
       text: '안녕하세요! 무엇을 도와드릴까요?',
       type: 'system',
       timestamp: new Date().toISOString(),
+      markdown: false,
     },
   ]);
 
@@ -29,21 +30,26 @@ export default function useAgent({ onExpandFull } = {}) {
   }, [onExpandFull]);
 
   const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-  const ENDPOINT = '/api/v1/userInputRe/'; // ✅ curl과 통일
+  const ENDPOINT = '/api/v1/userInputRe/';
 
-  const addMessage = (text, type = 'user', markdown) => {
+  const addMessage = (text, type = 'user', {markdown=false} = {}) => {
     const newMessage = {
       id: Date.now(),
       text,
       type,
       timestamp: new Date().toISOString(),
-      markdown: true,
+      markdown,
     };
     setMessages((prev) => [...prev, newMessage]);
   };
 
-  const addBotMessage = (text) => addMessage(text, 'bot');
-  const addSystemMessage = (text) => addMessage(text, 'system');
+  const addBotMessage = (text) => {
+    addMessage(text, 'bot', {markdown: true});
+  };
+
+  const addSystemMessage = (text) => {
+    addMessage(text, 'system', { markdown: false });
+  };
 
   const route = (data) => {
     setLastResponse(data);
@@ -68,13 +74,14 @@ export default function useAgent({ onExpandFull } = {}) {
       }
 
       case 'info_required': {
-        // ✅ missing_parameter -> missing_params
-        next.missing = { schema: data.parameter_schema || null, required: data.missing_params || [] };
+        next.missing = { schema: data.parameter_schema ?? null, required: data.missing_params ?? [] };
+        if (data.message) addBotMessage(data.message);
         break;
       }
 
       case 'confirm_required': {
-        next.confirm = { intent: data.intent, params: data.parameters || {} };
+        next.confirm = { intent: data.intent, params: data.parameters };
+        if (data.message) addBotMessage(data.message);
         break;
       }
 
@@ -87,18 +94,20 @@ export default function useAgent({ onExpandFull } = {}) {
       case 'executed': {
         next.toast = { type: 'success', text: data.message || '완료되었습니다.' };
         if (data.message) addBotMessage(data.message);
-        // ✅ output_type 대신 exec 존재로 확장 판단
-        if (data.exec && data.exec !== 'guide') onExpandFullRef.current?.();
+        if (data.exec ? data.exec !== 'guide' : (data.output_type && data.output_type !== 'guide')) {
+          onExpandFullRef.current?.();
+        }
         break;
       }
 
       case 'cancelled': {
         next.toast = { type: 'info', text: data.message || '사용자 취소' };
+        if (data.message) addBotMessage(data.message);
         break;
       }
 
-      case 'error': // ✅ 백엔드가 쓰는 상태
-      case 'execution_failed': { // 혹시 다른 구현과도 호환
+      case 'error':
+      case 'execution_failed': { 
         next.error = { message: data.message || '실행 중 오류가 발생했습니다.', details: data.errors || [] };
         if (data.message) addBotMessage(data.message);
         break;
@@ -106,13 +115,13 @@ export default function useAgent({ onExpandFull } = {}) {
 
       case 'unknown_method': {
         next.toast = { type: 'warning', text: data.message || '지원되지 않는 method입니다.' };
+        if (data.message) addBotMessage(data.message);
         break;
       }
 
       case 'low_confidence':
       case 'no_intent':
       default:
-        // 보여줄 UI 없음
         break;
     }
 
@@ -145,7 +154,7 @@ export default function useAgent({ onExpandFull } = {}) {
       text,
       method: String(method).toUpperCase(),
       parameters,
-      interaction_id: interactionId, // ✅ 백엔드 키와 일치
+      interaction_id: interactionId, 
     };
     return call(payload);
   };

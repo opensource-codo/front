@@ -6,6 +6,8 @@ import arrowSubmit from '../assets/arrow-submit.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
 import useAgent from '../hooks/useAgent';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [inputText, setInputText] = useState('');
@@ -135,9 +137,23 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                     {activeMenu === 'home' ? (
                         <>
                             {messages.map((m) => (
-                                <div key={m.id} className={`message ${m.type}`}>
+                              <div key={m.id} className={`message ${m.type}`}>
+                                {m.type === 'bot' ? (
+                                  <ReactMarkdown
+                                    components={{
+                                      a: ({node, ...props}) => (
+                                        <a {...props} target="_blank" rel="noopener noreferrer" />
+                                      )
+                                    }}
+                                    // GFM이 필요 없으면 다음 줄 삭제하세요.
+                                    remarkPlugins={[remarkGfm]}
+                                  >
                                     {m.text}
-                                </div>
+                                  </ReactMarkdown>
+                                ) : (
+                                  m.text
+                                )}
+                              </div>
                             ))}
 
                             {/* GUIDE 카드 */}

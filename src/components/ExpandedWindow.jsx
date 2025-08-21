@@ -4,6 +4,8 @@ import maximizeIcon from '../assets/checkbox.png';
 import closeIcon from '../assets/close.png';
 import '../css/ExpandedWindow.css';
 import useAgent from '../hooks/useAgent';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 function ExpandedWindow({ agent, onClose, onExpandFull }) {
   
@@ -65,7 +67,24 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
       <div className="body" ref={bodyRef}>
         {/* 채팅 말풍선 */}
         {messages.map((m) => (
-          <div key={m.id} className={`message ${m.type}`}>{m.text}</div>
+          <div key={m.id} className={`message ${m.type}`}>
+            {m.type === 'bot' ? (
+              <ReactMarkdown
+                // 링크를 새 탭으로 열기: linkTarget prop 대신 components로 a 태그를 오버라이드
+                components={{
+                  a: ({node, ...props}) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" />
+                  ),
+                  // 필요시 코드블록/리스트 등도 커스텀 가능
+                }}
+                remarkPlugins={[remarkGfm]} // 옵션: 테이블, 체크박스 등 GFM 지원
+              >
+                {m.text}
+              </ReactMarkdown>
+            ) : (
+              m.text
+            )}
+          </div>
         ))}
 
         {/* GUIDE 카드 */}
@@ -134,7 +153,7 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
           onKeyDown={onKeyDown}
           disabled={loading}
         />
-        <button className="send-button" onClick={() => sendMessage('GUIDE')} disabled={loading}>
+        <button className="send-button" onClick={() => sendMessage(mode)} disabled={loading}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
