@@ -18,9 +18,10 @@ export default function useAgent({ onExpandFull } = {}) {
     guide: null,
     missing: null,
     confirm: null,
-    console: null,
+    console: null,   // 실행 계획/출력 표시용
     toast: null,
     error: null,
+    meta: null,
   });
 
   const onExpandFullRef = useRef(onExpandFull);
@@ -29,8 +30,17 @@ export default function useAgent({ onExpandFull } = {}) {
   }, [onExpandFull]);
 
   const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-  const ENDPOINT = '/api/v1/userInputRe/'; // ✅ curl과 통일
+  const EXEC_API_URL = process.env.REACT_APP_EXEC_API_BASE_URL || API_URL;
 
+  const ENDPOINT_BASE = '/api/v1/userInputRe';      // 가이드/컨티뉴/컨펌 플로우
+  const SIMPLE_EXEC_ENDPOINT = '/api/v1/userinput'; // 실제 스크립트 실행 엔드포인트
+  const lastUserTextRef = useRef('');               // EXECUTION 전환 시 텍스트 보존
+
+  const url = `${EXEC_API_URL}/api/v1/userinput`;
+
+  
+  
+  // ───────────────────────── helpers ─────────────────────────
   const addMessage = (text, type = 'user', markdown) => {
     const newMessage = {
       id: Date.now(),
@@ -48,7 +58,6 @@ export default function useAgent({ onExpandFull } = {}) {
   const route = (data) => {
     setLastResponse(data);
 
-    // ✅ interaction_Id -> interaction_id
     if (data?.interaction_id) setInteractionId(data.interaction_id);
 
     const next = {
@@ -58,6 +67,7 @@ export default function useAgent({ onExpandFull } = {}) {
       error: null,
       toast: null,
       console: null,
+      meta: { intent: data?.intent, methodUsed: data?.method_used, similarity: data?.similarity },
     };
 
     switch (data?.status) {
@@ -66,49 +76,40 @@ export default function useAgent({ onExpandFull } = {}) {
         if (data.message) addBotMessage(data.message);
         break;
       }
-
       case 'info_required': {
-        // ✅ missing_parameter -> missing_params
         next.missing = { schema: data.parameter_schema || null, required: data.missing_params || [] };
         break;
       }
-
       case 'confirm_required': {
         next.confirm = { intent: data.intent, params: data.parameters || {} };
         break;
       }
-
       case 'ready_to_execute': {
-        // 선택: UX상 알림만. 필요 시 confirm과 동일 동작으로 바꿔도 됨.
         next.toast = { type: 'info', text: data.message || '실행 준비가 완료되었습니다.' };
+        if (data.exec) next.console = data.exec; // 계획/명령 스펙 표시
         break;
       }
-
       case 'executed': {
         next.toast = { type: 'success', text: data.message || '완료되었습니다.' };
         if (data.message) addBotMessage(data.message);
-        // ✅ output_type 대신 exec 존재로 확장 판단
         if (data.exec && data.exec !== 'guide') onExpandFullRef.current?.();
+        if (data.exec) next.console = data.exec; // 실행 결과 표시
         break;
       }
-
       case 'cancelled': {
         next.toast = { type: 'info', text: data.message || '사용자 취소' };
         break;
       }
-
-      case 'error': // ✅ 백엔드가 쓰는 상태
-      case 'execution_failed': { // 혹시 다른 구현과도 호환
+      case 'error':
+      case 'execution_failed': {
         next.error = { message: data.message || '실행 중 오류가 발생했습니다.', details: data.errors || [] };
         if (data.message) addBotMessage(data.message);
         break;
       }
-
       case 'unknown_method': {
         next.toast = { type: 'warning', text: data.message || '지원되지 않는 method입니다.' };
         break;
       }
-
       case 'low_confidence':
       case 'no_intent':
       default:
@@ -119,14 +120,22 @@ export default function useAgent({ onExpandFull } = {}) {
     setUi(next);
   };
 
+  // ───────────────────────── networking ─────────────────────────
+  const postJson = async (url, payload) => {
+    return axios.post(url, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  };
+
+  // 기본(/) 호출 → Handle User Input (가이드/분기/플랜)
   const call = async (payload) => {
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}${ENDPOINT}`, payload);
+      const url = `${API_URL}${ENDPOINT_BASE}/`; // POST /api/v1/userInputRe/
+      const res = await postJson(url, payload);
       route(res.data);
       return res.data;
     } catch (e) {
-      // 네트워크/서버 오류 토스트
       setUi((prev) => ({
         ...prev,
         error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
@@ -138,56 +147,144 @@ export default function useAgent({ onExpandFull } = {}) {
     }
   };
 
-  // 일반 전송
+  // suffix 지정 호출 → /continue, /confirm 등
+  const callTo = async (suffix, payload) => {
+    setLoading(true);
+    try {
+      const url = `${API_URL}${ENDPOINT_BASE}${suffix}`;
+      const res = await postJson(url, payload);
+      route(res.data);
+      return res.data;
+    } catch (e) {
+      setUi((prev) => ({
+        ...prev,
+        error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
+        toast: { type: 'error', text: '요청 실패' },
+      }));
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 바로 실행 → /api/v1/userinput (스크립트 즉시 실행)
+  const executeNow = async (text) => {
+    const trimmed = String(text || '').trim();
+    if (!trimmed) return;
+    addMessage(trimmed, 'user');
+    setLoading(true);
+    try {
+      const url = `${API_URL}${SIMPLE_EXEC_ENDPOINT}`; // POST /api/v1/userinput
+      const res = await postJson(url, { text: trimmed, method: 'EXECUTION' });
+      route(res.data); // status: executed | error | no_intent | unknown_method ...
+      return res.data;
+    } catch (e) {
+      setUi((prev) => ({
+        ...prev,
+        error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
+        toast: { type: 'error', text: '요청 실패' },
+      }));
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ───────────────────────── public API ─────────────────────────
+  // 일반 전송 (GUIDE/EXECUTION) → 항상 "/" 로 보냄
   const send = ({ text, method = 'GUIDE', parameters = {} }) => {
     addMessage(text, 'user');
+    lastUserTextRef.current = text; // EXECUTION 전환 대비 저장
     const payload = {
       text,
       method: String(method).toUpperCase(),
       parameters,
-      interaction_id: interactionId, // ✅ 백엔드 키와 일치
+      interaction_id: interactionId,
     };
-    return call(payload);
+    return call(payload); // POST /api/v1/userInputRe/
   };
 
-  // GUIDE → EXECUTION
+  // 편의: GUIDE 전송
+  const sendGuide = (text) => send({ text, method: 'GUIDE' });
+
+  // 편의: EXECUTION 전송(플랜 모드)
+  const sendExecution = (text, parameters = {}) =>
+    send({ text, method: 'EXECUTION', parameters });
+
+  // GUIDE → EXECUTION 전환 (서버가 준 파라미터 유지)
   const goToExecution = () =>
     call({
-      ...lastResponse,
+      text: lastUserTextRef.current || '',
       method: 'EXECUTION',
       parameters: lastResponse?.parameters || {},
       interaction_id: interactionId,
     });
 
-  // 누락 파라미터 제출
-  const submitMissingParams = (filled) =>
-    call({
-      ...lastResponse,
-      method: 'EXECUTION',
-      parameters: { ...(lastResponse?.parameters || {}), ...filled },
+  // 누락 파라미터 제출 → "/continue"
+  const submitMissingParams = (filled) => {
+    if (!interactionId) {
+      setUi((prev) => ({
+        ...prev,
+        toast: { type: 'error', text: '세션이 만료되었거나 없습니다. 처음부터 다시 시도하세요.' },
+      }));
+      return Promise.reject(new Error('No interaction_id for /continue'));
+    }
+    return callTo('/continue', {
       interaction_id: interactionId,
+      parameters: { ...(lastResponse?.parameters || {}), ...filled },
+      text: '',
+      method: 'EXECUTION',
     });
+  };
 
-  // 확인 / 취소
-  const confirmExecution = () =>
-    call({ ...lastResponse, method: 'EXECUTION', confirm: true, interaction_id: interactionId });
+  // 확인 / 취소 → "/confirm"
+  const confirmExecution = () => {
+    if (!interactionId) {
+      setUi((prev) => ({
+        ...prev,
+        toast: { type: 'error', text: '세션이 만료되었거나 없습니다. 처음부터 다시 시도하세요.' },
+      }));
+      return Promise.reject(new Error('No interaction_id for /confirm'));
+    }
+    return callTo('/confirm', { interaction_id: interactionId, confirm: true });
+  };
 
-  const cancelExecution = () =>
-    call({ ...lastResponse, method: 'EXECUTION', cancel: true, interaction_id: interactionId });
+  const cancelExecution = () => {
+    if (!interactionId) {
+      setUi((prev) => ({
+        ...prev,
+        toast: { type: 'error', text: '세션이 만료되었거나 없습니다. 처음부터 다시 시도하세요.' },
+      }));
+      return Promise.reject(new Error('No interaction_id for /confirm'));
+    }
+    return callTo('/confirm', { interaction_id: interactionId, confirm: false });
+  };
 
   return {
+    // state
     interactionId,
     lastResponse,
     loading,
     ui,
     messages,
+
+    // message helpers
     addMessage,
     addBotMessage,
     addSystemMessage,
-    send,
-    goToExecution,
-    submitMissingParams,
-    confirmExecution,
-    cancelExecution,
+
+    // main actions
+    send,            // "/" (GUIDE/EXECUTION 공용: 플랜)
+    sendGuide,       // "/"
+    sendExecution,   // "/"
+    goToExecution,   // "/"
+
+    // follow-ups
+    submitMissingParams, // "/continue"
+    confirmExecution,    // "/confirm"
+    cancelExecution,     // "/confirm"
+
+    // direct execution
+    executeNow,          // "/api/v1/userinput" (실행)
   };
 }
