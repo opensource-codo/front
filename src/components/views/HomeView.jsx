@@ -1,4 +1,4 @@
-import React from 'react';
+import styles from '../../css/FullExpandedWindow.module.css';
 import ChatBody from '../ChatBody';
 import ChatInput from '../ChatInput';
 
@@ -28,9 +28,10 @@ function HomeView({
                 onSubmitMissing={submitMissingParams}
                 onConfirm={confirmExecution}
                 onCancel={cancelExecution}
+                variant="few"
             />
 
-            <div className='input-container'>
+            <div className={styles.inputContainer}>
                 <ChatInput
                     value={inputText}
                     onChange={setInputText}

@@ -10,6 +10,7 @@ import './css/common.css';
 function App() {
   const [isAuthed, setIsAuthed] = useState(false);
   const [windowSize, setWindowSize] = useState('compact');
+  const [userInfo, setUserInfo] = useState(null);
   // 'compact', 'expanded', 'full' 중 하나로 
 
   // useAgent를 App 레벨에서 관리하여 메시지 공유
@@ -26,10 +27,21 @@ function App() {
   }, []);
 
   // GoogleLoginButton에서 성공 시 호출할 핸들러
-  const handleAuthed = () => {
-    localStorage.setItem('authed', '1'); // 새로고침에도 유지
+  const handleAuthed = async (res) => {
+    localStorage.setItem('authed', '1');
     setIsAuthed(true);
-    setWindowSize('expanded'); // compact 대신 expanded로 설정
+    setWindowSize('expanded');
+    if (res?.access_token) {
+      try {
+        const r = await fetch(
+          `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${res.access_token}`
+        );
+        const info = await r.json();
+        setUserInfo({ name: info.name, picture: info.picture });
+      } catch {
+        // 사용자 정보 로드 실패 시 기본값 유지
+      }
+    }
   };
 
 
@@ -80,6 +92,7 @@ function App() {
           agent={agent}
           onMinimize={() => setWindowSize('expanded')}
           onClose={() => setWindowSize('compact')}
+          userInfo={userInfo}
         />
       )}
     </div>

@@ -1,34 +1,34 @@
-import React from 'react';
+import styles from '../../css/FullExpandedWindow.module.css';
 
 function FrequentView({ frequentFunctions, recentFunctions, loading }) {
     return (
-        <div className='frequent-functions-container'>
+        <div className={styles.frequentFunctionsContainer}>
             <h2>자주 쓰는 기능</h2>
 
             {loading ? (
-                <div className='few-loading'>로딩 중...</div>
+                <div className={styles.fewLoading}>로딩 중...</div>
             ) : (
                 <>
-                    <div className='frequent-functions-grid'>
+                    <div className={styles.frequentFunctionsGrid}>
                         {frequentFunctions.map((func, index) => (
-                            <div key={index} className='function-card'>
-                                <div className='function-icon'>{func.icon}</div>
-                                <div className='function-title'>{func.title}</div>
-                                <div className='function-description'>{func.description}</div>
-                                <div className='function-shortcut'>{func.shortcut}</div>
+                            <div key={index} className={styles.functionCard}>
+                                <div className={styles.functionIcon}>{func.icon}</div>
+                                <div className={styles.functionTitle}>{func.title}</div>
+                                <div className={styles.functionDescription}>{func.description}</div>
+                                <div className={styles.functionShortcut}>{func.shortcut}</div>
                             </div>
                         ))}
                     </div>
 
-                    <div className='recent-functions-section'>
+                    <div className={styles.recentFunctionsSection}>
                         <h3>최근 쓴 기능들</h3>
-                        <p className='subtitle'>가장 최근에 한 질문들</p>
+                        <p className={styles.subtitle}>가장 최근에 한 질문들</p>
 
-                        <div className='recent-functions-list'>
+                        <div className={styles.recentFunctionsList}>
                             {recentFunctions.map((func, index) => (
-                                <div key={index} className='recent-function-item'>
-                                    <div className='recent-function-title'>{func.title}</div>
-                                    <div className='recent-function-time'>{func.time}</div>
+                                <div key={index} className={styles.recentFunctionItem}>
+                                    <div className={styles.recentFunctionTitle}>{func.title}</div>
+                                    <div className={styles.recentFunctionTime}>{func.time}</div>
                                 </div>
                             ))}
                         </div>

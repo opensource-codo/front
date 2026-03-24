@@ -1,4 +1,4 @@
-import React from 'react';
+import styles from '../css/Chat.module.css';
 
 function ChatInput({ value, onChange, onSend, mode, onModeChange, disabled }) {
   const onKeyDown = (e) => {
@@ -10,17 +10,17 @@ function ChatInput({ value, onChange, onSend, mode, onModeChange, disabled }) {
 
   return (
     <>
-      <div className="chat-input-area">
+      <div className={styles.chatInputArea}>
         <input
           type="text"
           placeholder="질문을 입력하세요..."
-          className="chat-input"
+          className={styles.chatInput}
           value={value}
           onChange={e => onChange(e.target.value)}
           onKeyDown={onKeyDown}
           disabled={disabled}
         />
-        <button className="send-button" onClick={() => onSend(mode)} disabled={disabled}>
+        <button className={styles.sendButton} onClick={() => onSend(mode)} disabled={disabled}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -29,10 +29,10 @@ function ChatInput({ value, onChange, onSend, mode, onModeChange, disabled }) {
         </button>
       </div>
 
-      <div className="suggestion-buttons">
+      <div className={styles.suggestionButtons}>
         <button
           onClick={() => onModeChange('GUIDE')}
-          className={`suggestion-button ${mode === 'GUIDE' ? 'active' : ''}`}
+          className={`${styles.suggestionButton} ${mode === 'GUIDE' ? styles.active : ''}`}
           aria-pressed={mode === 'GUIDE'}
           disabled={disabled}
         >
@@ -40,7 +40,7 @@ function ChatInput({ value, onChange, onSend, mode, onModeChange, disabled }) {
         </button>
         <button
           onClick={() => onModeChange('EXECUTION')}
-          className={`suggestion-button ${mode === 'EXECUTION' ? 'active' : ''}`}
+          className={`${styles.suggestionButton} ${mode === 'EXECUTION' ? styles.active : ''}`}
           aria-pressed={mode === 'EXECUTION'}
           disabled={disabled}
         >

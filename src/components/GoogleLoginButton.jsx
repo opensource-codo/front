@@ -7,8 +7,7 @@ export default function GoogleLoginButton({ onAuthed }) {
     prompt: 'select_account',
     useOneTap: false,
     onSuccess: (res) => {
-      console.log('로그인 성공:', res);
-      onAuthed?.();
+      onAuthed?.(res);
     },
     onError: (err) => console.error('로그인 실패:', err),
   });

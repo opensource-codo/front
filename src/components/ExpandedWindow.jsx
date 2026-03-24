@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import maximizeIcon from '../assets/checkbox.png';
 import closeIcon from '../assets/close.png';
-import '../css/ExpandedWindow.css';
+import styles from '../css/ExpandedWindow.module.css';
 import useGuideHistory from '../hooks/useGuideHistory';
 import ChatBody from './ChatBody';
 import ChatInput from './ChatInput';
@@ -31,13 +31,13 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
   };
 
   return (
-    <div className="expanded-window">
-      <div className="ew-header">
+    <div className={styles.expandedWindow}>
+      <div className={styles.ewHeader}>
         <img src={maximizeIcon} alt="Maximize" onClick={onExpandFull} aria-label="창 최대화" role="button" />
         <img src={closeIcon} alt="Close" onClick={onClose} aria-label="창 닫기" role="button" />
       </div>
 
-      <div className="ew-body" ref={bodyRef}>
+      <div className={styles.ewBody} ref={bodyRef}>
         <ChatBody
           messages={messages}
           guideHistory={guideHistory}

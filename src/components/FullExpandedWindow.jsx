@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import minimizeIcon from '../assets/minimize.png';
 import closeIcon from '../assets/close.png';
 import codoIcon from '../assets/CODO_icon.png';
-import '../css/FullExpandedWindow.css';
+import styles from '../css/FullExpandedWindow.module.css';
 import useGuideHistory from '../hooks/useGuideHistory';
 import useFunctions from '../hooks/useFunctions';
 import HomeView from './views/HomeView';
 import FrequentView from './views/FrequentView';
 import SettingsView from './views/SettingsView';
 
-function FullExpandedWindow({ agent, onMinimize, onClose }) {
+function FullExpandedWindow({ agent, onMinimize, onClose, userInfo }) {
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState('GUIDE');
     const [activeMenu, setActiveMenu] = useState('home');
@@ -76,49 +76,52 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
     };
 
     return (
-        <div className='full-expanded-window'>
-            <aside className='sidebar'>
-                <div className='logo' onClick={onClose} style={{ cursor: 'pointer' }}>
-                    <img src={codoIcon} alt="CODO Icon" className="logo-icon" />
+        <div className={styles.fullExpandedWindow}>
+            <aside className={styles.sidebar}>
+                <div className={styles.logo} onClick={onClose} style={{ cursor: 'pointer' }}>
+                    <img src={codoIcon} alt="CODO Icon" className={styles.logoIcon} />
                     CODO
                 </div>
 
-                <nav className='menu'>
+                <nav className={styles.menu}>
                     <button
-                        className={`menu-item ${activeMenu === 'frequent' ? 'active' : ''}`}
+                        className={`${styles.menuItem} ${activeMenu === 'frequent' ? styles.active : ''}`}
                         onClick={handleFrequentMenuClick}
                     >
                         📌 자주 쓰는 기능
                     </button>
                     <button
-                        className={`menu-item ${activeMenu === 'settings' ? 'active' : ''}`}
+                        className={`${styles.menuItem} ${activeMenu === 'settings' ? styles.active : ''}`}
                         onClick={() => setActiveMenu('settings')}
                     >
                         ⚙️ 설정
                     </button>
                     <button
-                        className={`menu-item ${activeMenu === 'home' ? 'active' : ''}`}
+                        className={`${styles.menuItem} ${activeMenu === 'home' ? styles.active : ''}`}
                         onClick={() => setActiveMenu('home')}
                     >
                         🏠 홈
                     </button>
                 </nav>
 
-                <div className="spacer" />
+                <div className={styles.spacer} />
 
-                <div className='user-profile'>
-                    <div className='avatar'></div>
-                    <div className='username'>사용자</div>
+                <div className={styles.userProfile}>
+                    {userInfo?.picture
+                        ? <img src={userInfo.picture} alt="프로필" className={styles.avatar} />
+                        : <div className={styles.avatar} />
+                    }
+                    <div className={styles.username}>{userInfo?.name ?? '사용자'}</div>
                 </div>
             </aside>
 
-            <div className='main-content'>
-                <div className='few-header'>
+            <div className={styles.mainContent}>
+                <div className={styles.fewHeader}>
                     <img src={minimizeIcon} alt="Minimize" onClick={onMinimize} />
                     <img src={closeIcon} alt="Close" onClick={onClose} />
                 </div>
 
-                <div className='few-body' ref={bodyRef}>
+                <div className={styles.fewBody} ref={bodyRef}>
                     {renderView()}
                 </div>
             </div>
