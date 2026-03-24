@@ -5,8 +5,9 @@ import closeIcon from '../assets/close.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
 import useGuideHistory from '../hooks/useGuideHistory';
-import ChatBody from './ChatBody';
-import ChatInput from './ChatInput';
+import HomeView from './views/HomeView';
+import FrequentView from './views/FrequentView';
+import SettingsView from './views/SettingsView';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
 
@@ -69,6 +70,39 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         await send({ text, method });
     };
 
+    const renderView = () => {
+        switch (activeMenu) {
+            case 'frequent':
+                return (
+                    <FrequentView
+                        frequentFunctions={frequentFunctions}
+                        recentFunctions={recentFunctions}
+                        loading={loading}
+                    />
+                );
+            case 'settings':
+                return <SettingsView />;
+            default:
+                return (
+                    <HomeView
+                        messages={messages}
+                        guideHistory={guideHistory}
+                        ui={ui}
+                        agentLoading={agentLoading}
+                        goToExecution={goToExecution}
+                        submitMissingParams={submitMissingParams}
+                        confirmExecution={confirmExecution}
+                        cancelExecution={cancelExecution}
+                        inputText={inputText}
+                        setInputText={setInputText}
+                        sendMessage={sendMessage}
+                        mode={mode}
+                        setMode={setMode}
+                    />
+                );
+        }
+    };
+
     return (
         <div className='full-expanded-window'>
             <aside className='sidebar'>
@@ -113,71 +147,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                 </div>
 
                 <div className='few-body' ref={bodyRef}>
-                    {activeMenu === 'home' ? (
-                        <>
-                            <ChatBody
-                                messages={messages}
-                                guideHistory={guideHistory}
-                                ui={ui}
-                                loading={agentLoading}
-                                onGoToExecution={goToExecution}
-                                onSubmitMissing={submitMissingParams}
-                                onConfirm={confirmExecution}
-                                onCancel={cancelExecution}
-                            />
-
-                            <div className='input-container'>
-                                <ChatInput
-                                    value={inputText}
-                                    onChange={setInputText}
-                                    onSend={sendMessage}
-                                    mode={mode}
-                                    onModeChange={setMode}
-                                    disabled={agentLoading}
-                                />
-                            </div>
-                        </>
-                    ) : activeMenu === 'frequent' ? (
-                        <div className='frequent-functions-container'>
-                            <h2>자주 쓰는 기능</h2>
-
-                            {loading ? (
-                                <div className='few-loading'>로딩 중...</div>
-                            ) : (
-                                <>
-                                    <div className='frequent-functions-grid'>
-                                        {frequentFunctions.map((func, index) => (
-                                            <div key={index} className='function-card'>
-                                                <div className='function-icon'>{func.icon}</div>
-                                                <div className='function-title'>{func.title}</div>
-                                                <div className='function-description'>{func.description}</div>
-                                                <div className='function-shortcut'>{func.shortcut}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className='recent-functions-section'>
-                                        <h3>최근 쓴 기능들</h3>
-                                        <p className='subtitle'>가장 최근에 한 질문들</p>
-
-                                        <div className='recent-functions-list'>
-                                            {recentFunctions.map((func, index) => (
-                                                <div key={index} className='recent-function-item'>
-                                                    <div className='recent-function-title'>{func.title}</div>
-                                                    <div className='recent-function-time'>{func.time}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    ) : (
-                        <div className='settings-container'>
-                            <h2>설정</h2>
-                            <p>설정 화면이 여기에 표시됩니다.</p>
-                        </div>
-                    )}
+                    {renderView()}
                 </div>
             </div>
         </div>
