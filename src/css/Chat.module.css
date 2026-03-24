@@ -56,11 +56,14 @@
 }
 
 .guide {
-  background-color: rgba(248, 250, 252, 0.7);
+  width: 100%;
+  max-width: 100%;
+  background-color: rgba(248, 250, 252, 0.85);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   align-self: flex-start;
   backdrop-filter: none;
+  border-left: 3px solid var(--primary-color);
 }
 
 /* ========= Chat Input ========= */
@@ -101,10 +104,10 @@
 
 /* ========= Buttons ========= */
 .sendButton {
-  padding: 12px 20px;
+  padding: 8px 16px;
   border-radius: var(--radius-lg);
   color: white;
-  background-color: var(--primary-hover);
+  background-color: var(--primary-color);
   border: none;
   cursor: pointer;
   font-weight: 500;
@@ -113,6 +116,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sendButton:hover {
@@ -123,6 +128,14 @@
 
 .sendButton:active {
   transform: translateY(0);
+  box-shadow: none;
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .suggestionButtons {
@@ -178,16 +191,23 @@
 }
 
 .secondaryButton {
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: white;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .secondaryButton:hover {
   border-color: var(--border-hover);
+  color: var(--text-primary);
   box-shadow: var(--shadow-sm);
 }
 
@@ -283,13 +303,22 @@
 .info    { background: #eff6ff; border-color: #bfdbfe; }
 .warning { background: #fef9c3; border-color: #fde68a; }
 
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
 .loading {
   margin-top: 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: .9rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-lg);
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  font-weight: 500;
   display: inline-flex;
   align-self: center;
   width: auto;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  animation: loadingPulse 1.4s ease-in-out infinite;
 }

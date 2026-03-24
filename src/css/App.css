@@ -45,8 +45,8 @@ body {
 
 .app-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  inset: 0;
+  pointer-events: none;
   z-index: 9999;
 }
 
@@ -55,7 +55,8 @@ body {
   padding: 0;
   margin: 0;
   box-shadow: none;
-  transition: transform 0.2s ease;
+  pointer-events: auto;
+  user-select: none;
 }
 
 .compact-window:hover {

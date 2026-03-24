@@ -16,14 +16,13 @@
 }
 
 .sidebar {
-  width: 280px;
-  background: linear-gradient(135deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.5) 100%);
-  padding: 32px 24px;
+  width: 240px;
+  background: rgba(248, 250, 252, 0.4);
+  padding: 28px 20px;
   display: flex;
   flex-direction: column;
   height: 100%;
   border-right: 1px solid var(--border-color);
-  backdrop-filter: blur(10px);
 }
 
 .logo {
@@ -80,17 +79,15 @@
 
 .userProfile {
   margin-top: auto;
-  margin-left: 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  padding: 16px;
+  padding: 12px;
   border-radius: var(--radius-lg);
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
   border: 1px solid var(--border-color);
-  backdrop-filter: blur(10px);
 }
 
 .avatar {
@@ -122,14 +119,13 @@ img.avatar::before {
 .mainContent {
   flex: 1;
   position: relative;
-  padding: 48px;
-  background-color: rgba(255, 255, 255, 0.5);
+  padding: 56px 40px 32px;
+  background-color: rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
-  backdrop-filter: blur(10px);
 }
 
 .fewHeader {
@@ -140,44 +136,45 @@ img.avatar::before {
   left: 0;
   right: 0;
   display: flex;
-  gap: 16px;
-  padding: 8px 24px 0 24px;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 16px 0;
   -webkit-app-region: drag;
 }
 
 .fewHeader img {
-  width: 36px;
-  height: 36px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 0.45;
   transition: all 0.2s ease;
-  padding: 8px;
+  padding: 5px;
   border-radius: var(--radius-sm);
-  background-color: rgba(248, 250, 252, 0.7);
+  background-color: transparent;
   -webkit-app-region: no-drag;
   pointer-events: auto;
+  box-sizing: content-box;
 }
 
 .fewHeader img:hover {
   opacity: 1;
-  background-color: var(--primary-color);
-  transform: scale(1.1);
+  background-color: rgba(99, 102, 241, 0.12);
+  transform: scale(1.05);
 }
 
 .fewBody {
   width: 100%;
-  max-width: 800px;
+  max-width: 760px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 8px;
+  padding: 8px 0 16px;
   overflow-y: auto;
   flex-grow: 1;
   min-height: 100px;
-  max-height: 600px;
 }
 
 .fewBody h2 {
@@ -189,23 +186,22 @@ img.avatar::before {
 
 /* ========= Input Container ========= */
 .inputContainer {
-  background-color: rgba(248, 250, 252, 0.7);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-2xl);
-  padding: 12px;
+  background-color: rgba(248, 250, 252, 0.8);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 8px 12px;
   width: 100%;
-  max-width: 800px;
-  box-shadow: var(--shadow-md);
+  max-width: 760px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  backdrop-filter: blur(10px);
 }
 
 .inputContainer:focus-within {
-  border-color: var(--border-color);
-  box-shadow: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
 }
 
 /* ========= Frequent Functions ========= */
@@ -230,14 +226,13 @@ img.avatar::before {
 }
 
 .functionCard {
-  background-color: rgba(248, 250, 252, 0.7);
+  background-color: rgba(255, 255, 255, 0.6);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 24px;
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
-  backdrop-filter: none;
 }
 
 .functionCard:hover {
@@ -327,11 +322,17 @@ img.avatar::before {
   color: var(--text-secondary);
 }
 
+@keyframes fewLoadingPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
 .fewLoading {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
+  font-size: 1rem;
+  color: var(--primary-color);
   text-align: center;
   padding: 48px 0;
+  animation: fewLoadingPulse 1.4s ease-in-out infinite;
 }
 
 /* ========= Settings ========= */
@@ -348,10 +349,3 @@ img.avatar::before {
   font-weight: 600;
 }
 
-/* ========= 배경 오버라이드 ========= */
-.sidebar,
-.mainContent {
-  background: transparent;
-  background-color: transparent;
-  backdrop-filter: none;
-}

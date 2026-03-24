@@ -26,20 +26,21 @@
 }
 
 .ewHeader img {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 0.5;
   transition: all 0.2s ease;
-  padding: 0px;
+  padding: 5px;
   border-radius: var(--radius-sm);
   background-color: transparent;
+  box-sizing: content-box;
 }
 
 .ewHeader img:hover {
   opacity: 1;
-  transform: scale(1.1);
-  background-color: var(--primary-color);
+  transform: scale(1.05);
+  background-color: rgba(99, 102, 241, 0.12);
 }
 
 .ewBody {
@@ -49,7 +50,7 @@
   align-items: stretch;
   text-align: left;
   gap: 8px;
-  padding: 20px 24px 0 24px;
+  padding: 16px 24px 12px;
   overflow-y: auto;
   flex-grow: 1;
   min-height: 100px;
