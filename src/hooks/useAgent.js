@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL, ENDPOINT_BASE, SIMPLE_EXEC_ENDPOINT } from '../api/endpoints';
 
 export default function useAgent({ onExpandFull } = {}) {
   const [interactionId, setInteractionId] = useState(null);
@@ -29,10 +30,6 @@ export default function useAgent({ onExpandFull } = {}) {
     onExpandFullRef.current = onExpandFull;
   }, [onExpandFull]);
 
-  const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-
-  const ENDPOINT_BASE = '/api/v1/userInputRe';      // 가이드/컨티뉴/컨펌 플로우
-  const SIMPLE_EXEC_ENDPOINT = '/api/v1/userinput'; // 실제 스크립트 실행 엔드포인트
   const lastUserTextRef = useRef('');               // EXECUTION 전환 시 텍스트 보존
 
   // ───────────────────────── helpers ─────────────────────────
@@ -49,6 +46,14 @@ export default function useAgent({ onExpandFull } = {}) {
 
   const addBotMessage = (text) => addMessage(text, 'bot');
   const addSystemMessage = (text) => addMessage(text, 'system');
+
+  const handleApiError = (e) => {
+    setUi((prev) => ({
+      ...prev,
+      error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
+      toast: { type: 'error', text: '요청 실패' },
+    }));
+  };
 
   const route = (data) => {
     setLastResponse(data);
@@ -126,16 +131,12 @@ export default function useAgent({ onExpandFull } = {}) {
   const call = async (payload) => {
     setLoading(true);
     try {
-      const url = `${API_URL}${ENDPOINT_BASE}/`; // POST /api/v1/userInputRe/
+      const url = `${API_BASE_URL}${ENDPOINT_BASE}/`; // POST /api/v1/userInputRe/
       const res = await postJson(url, payload);
       route(res.data);
       return res.data;
     } catch (e) {
-      setUi((prev) => ({
-        ...prev,
-        error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
-        toast: { type: 'error', text: '요청 실패' },
-      }));
+      handleApiError(e);
       throw e;
     } finally {
       setLoading(false);
@@ -146,16 +147,12 @@ export default function useAgent({ onExpandFull } = {}) {
   const callTo = async (suffix, payload) => {
     setLoading(true);
     try {
-      const url = `${API_URL}${ENDPOINT_BASE}${suffix}`;
+      const url = `${API_BASE_URL}${ENDPOINT_BASE}${suffix}`;
       const res = await postJson(url, payload);
       route(res.data);
       return res.data;
     } catch (e) {
-      setUi((prev) => ({
-        ...prev,
-        error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
-        toast: { type: 'error', text: '요청 실패' },
-      }));
+      handleApiError(e);
       throw e;
     } finally {
       setLoading(false);
@@ -169,16 +166,12 @@ export default function useAgent({ onExpandFull } = {}) {
     addMessage(trimmed, 'user');
     setLoading(true);
     try {
-      const url = `${API_URL}${SIMPLE_EXEC_ENDPOINT}`; // POST /api/v1/userinput
+      const url = `${API_BASE_URL}${SIMPLE_EXEC_ENDPOINT}`; // POST /api/v1/userinput
       const res = await postJson(url, { text: trimmed, method: 'EXECUTION' });
       route(res.data); // status: executed | error | no_intent | unknown_method ...
       return res.data;
     } catch (e) {
-      setUi((prev) => ({
-        ...prev,
-        error: { message: '요청 중 오류가 발생했습니다.', details: [String(e?.message || e)] },
-        toast: { type: 'error', text: '요청 실패' },
-      }));
+      handleApiError(e);
       throw e;
     } finally {
       setLoading(false);

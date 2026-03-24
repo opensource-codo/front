@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import minimizeIcon from '../assets/minimize.png';
 import closeIcon from '../assets/close.png';
 import codoIcon from '../assets/CODO_icon.png';
 import '../css/FullExpandedWindow.css';
 import useGuideHistory from '../hooks/useGuideHistory';
+import useFunctions from '../hooks/useFunctions';
 import HomeView from './views/HomeView';
 import FrequentView from './views/FrequentView';
 import SettingsView from './views/SettingsView';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
 
 function FullExpandedWindow({ agent, onMinimize, onClose }) {
     const [inputText, setInputText] = useState('');
     const [mode, setMode] = useState('GUIDE');
     const [activeMenu, setActiveMenu] = useState('home');
-    const [frequentFunctions, setFrequentFunctions] = useState([]);
-    const [recentFunctions, setRecentFunctions] = useState([]);
-    const [loading, setLoading] = useState(false);
+
+    const { frequentFunctions, recentFunctions, loading, fetchAll } = useFunctions();
 
     const bodyRef = useRef(null);
 
@@ -33,34 +30,9 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
         bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
     }, [messages, ui, agentLoading, guideHistory]);
 
-    const fetchFrequentFunctions = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/api/v1/frequent-functions`);
-            setFrequentFunctions(response.data);
-        } catch (error) {
-            console.error('자주 쓰는 기능을 가져오는데 실패했습니다:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchRecentFunctions = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/api/v1/recent-functions`);
-            setRecentFunctions(response.data);
-        } catch (error) {
-            console.error('최근 쓴 기능을 가져오는데 실패했습니다:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleFrequentMenuClick = () => {
         setActiveMenu('frequent');
-        fetchFrequentFunctions();
-        fetchRecentFunctions();
+        fetchAll();
     };
 
     const sendMessage = async (method = mode, overrideText) => {
