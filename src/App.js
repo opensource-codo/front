@@ -5,6 +5,7 @@ import FullExpandedWindow from './components/FullExpandedWindow';
 import GoogleLoginButton from './components/GoogleLoginButton';
 import useAgent from './hooks/useAgent';
 import './css/App.css';
+import './css/common.css';
 
 function App() {
   const [isAuthed, setIsAuthed] = useState(false);

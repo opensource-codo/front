@@ -107,12 +107,12 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
             </aside>
 
             <div className='main-content'>
-                <div className='header'>
+                <div className='few-header'>
                     <img src={minimizeIcon} alt="Minimize" onClick={onMinimize} />
                     <img src={closeIcon} alt="Close" onClick={onClose} />
                 </div>
 
-                <div className='body' ref={bodyRef}>
+                <div className='few-body' ref={bodyRef}>
                     {activeMenu === 'home' ? (
                         <>
                             <ChatBody
@@ -142,7 +142,7 @@ function FullExpandedWindow({ agent, onMinimize, onClose }) {
                             <h2>자주 쓰는 기능</h2>
 
                             {loading ? (
-                                <div className='loading'>로딩 중...</div>
+                                <div className='few-loading'>로딩 중...</div>
                             ) : (
                                 <>
                                     <div className='frequent-functions-grid'>

@@ -32,12 +32,12 @@ function ExpandedWindow({ agent, onClose, onExpandFull }) {
 
   return (
     <div className="expanded-window">
-      <div className="header">
+      <div className="ew-header">
         <img src={maximizeIcon} alt="Maximize" onClick={onExpandFull} aria-label="창 최대화" role="button" />
         <img src={closeIcon} alt="Close" onClick={onClose} aria-label="창 닫기" role="button" />
       </div>
 
-      <div className="body" ref={bodyRef}>
+      <div className="ew-body" ref={bodyRef}>
         <ChatBody
           messages={messages}
           guideHistory={guideHistory}
