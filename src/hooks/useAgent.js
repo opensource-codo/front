@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import readyToExecute from './ready_to_execute.json';
 
 export default function useAgent({ onExpandFull } = {}) {
   const [interactionId, setInteractionId] = useState(null);
@@ -31,16 +30,11 @@ export default function useAgent({ onExpandFull } = {}) {
   }, [onExpandFull]);
 
   const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-  const EXEC_API_URL = process.env.REACT_APP_EXEC_API_BASE_URL || API_URL;
 
   const ENDPOINT_BASE = '/api/v1/userInputRe';      // 가이드/컨티뉴/컨펌 플로우
   const SIMPLE_EXEC_ENDPOINT = '/api/v1/userinput'; // 실제 스크립트 실행 엔드포인트
   const lastUserTextRef = useRef('');               // EXECUTION 전환 시 텍스트 보존
 
-  const url = `${EXEC_API_URL}/api/v1/userinput`;
-
-  
-  
   // ───────────────────────── helpers ─────────────────────────
   const addMessage = (text, type = 'user', markdown) => {
     const newMessage = {
@@ -202,12 +196,6 @@ export default function useAgent({ onExpandFull } = {}) {
       parameters,
       interaction_id: interactionId,
     };
-    // 테스트용: method가 EXECUTION일 때 readyToExecute를 바로 처리
-    if (method.toUpperCase() === 'EXECUTION') {
-      route(readyToExecute);
-      return Promise.resolve(readyToExecute);
-    }
-
     return call(payload); // POST /api/v1/userInputRe/
   };
 

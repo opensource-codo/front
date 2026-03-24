@@ -338,7 +338,6 @@
 /* 메시지 텍스트에 특별히 한글 폰트 적용 */
 .message, .message * {
   font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
-  line-style: 1.4;
 }
 
 .body .message:last-child { margin-bottom: 0; }

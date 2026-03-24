@@ -55,12 +55,7 @@ function App() {
           />
         </div>
 
-      <GoogleLoginButton
-        onAuthed={() => {
-          setIsAuthed(true);
-          setWindowSize('expanded'); // compact 대신 expanded로 설정
-        }}
-      />
+      <GoogleLoginButton onAuthed={handleAuthed} />
     </div>
   );
 }

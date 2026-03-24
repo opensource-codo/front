@@ -51,3 +51,6 @@ Add-Content .gitignore "*.py[cod]"
 Add-Content .gitignore "*.egg-info/"
 Add-Content .gitignore "node_modules/"
 
+# Claude
+cladue/
+.claude/
